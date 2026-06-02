@@ -30,13 +30,11 @@ st.markdown("""
 st.title("⚡ CYBERAGENT VOICE WEB CLIENT ⚡")
 st.write("---")
 
-# Initialize the GenAI Client brain securely
-# IMPORTANT: Double-check that your Gemini API Key is exactly inside these quotes!
-API_KEY = 'Your_Gemini_API_Key'
-
-if API_KEY == 'Your_Gemini_API_Key' or not API_KEY:
-    st.error(
-        "⚠️ SYSTEM BLOCK: Please open 'app.py' in PyCharm and replace 'Your_Gemini_API_Key' with your actual key from Google AI Studio.")
+# Initialize the GenAI Client brain securely from Streamlit Cloud Secrets
+if "Your_Gemini_API_Key" in st.secrets:
+    API_KEY = st.secrets["Your_Gemini_API_Key"]
+else:
+    st.error("⚠️ SYSTEM BLOCK: Please add 'Your_Gemini_API_Key' inside your Streamlit Cloud Advanced Settings -> Secrets box.")
     st.stop()
 
 try:
@@ -44,7 +42,6 @@ try:
 except Exception as init_err:
     st.error(f"Failed to connect to Gemini API: {init_err}")
     st.stop()
-
 
 # =====================================================================
 # SYSTEM AUDIO GENERATION FUNCTION
