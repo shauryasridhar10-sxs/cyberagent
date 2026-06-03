@@ -85,21 +85,29 @@ def python_calculator(expression: str) -> str:
 
 
 def google_search_tool(query: str) -> str:
-    """Searches the live internet to get real-time information, news, or stats."""
+    """Advanced search tool that uses multiple fallback methods if the primary lookup fails."""
     try:
         with DDGS() as ddgs:
+            # Step 1: Try a clean standard text lookup
             results = [r for r in ddgs.text(query, max_results=3)]
-            if not results:
-                return "No real-time web results found for this search query."
-            summary = ""
-            for i, r in enumerate(results):
-                summary += f"[Source {i + 1}]: {r['body']}\n"
-            return summary
+            if results:
+                summary = ""
+                for i, r in enumerate(results):
+                    summary += f"[Source {i + 1}]: {r['body']}\n"
+                return summary
+            
+            # Step 2: Fallback to news-specific search if standard text drops
+            news_results = [r for r in ddgs.news(query, max_results=3)]
+            if news_results:
+                summary = "[Live News Vector Active]\n"
+                for i, r in enumerate(news_results):
+                    summary += f"[News {i + 1}]: {r['title']} - {r['body']}\n"
+                return summary
+                
+            return "No real-time web results found for this search query right now."
     except Exception as e:
-        return f"Internet lookup pipeline error: {str(e)}"
-
-
-agent_tools = [get_current_time, python_calculator, google_search_tool]
+        # Step 3: Prevent a crash and give a friendly fallback response to the AI model
+        return f"Internet lookup pipeline error: {str(e)}. Please suggest the user try searching again in a moment."
 
 # =====================================================================
 # 3. INTERACTIVE WEB AUTHENTICATION
