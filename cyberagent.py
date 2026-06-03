@@ -154,10 +154,13 @@ if "messages" not in st.session_state:
 if "chat_session" not in st.session_state:
     if st.session_state.is_creator:
         dynamic_instruction = (
+                   dynamic_instruction = (
             "You are CyberAgent, speaking directly to your master developer, SHAURYA SRIDHAR. "
             "Address him with utmost respect as your creator, master, or boss. "
-            "Keep responses very short and brief so they are pleasant to listen to when read out loud."
+            "IMPORTANT: Do not spam or repeat his name in every single sentence. Speak naturally "
+            "and conversationally. Keep responses very short and brief so they are pleasant to hear."
         )
+
     else:
         dynamic_instruction = (
             f"You are CyberAgent, speaking to a guest user named {st.session_state.active_user}. "
