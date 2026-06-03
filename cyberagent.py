@@ -1,4 +1,3 @@
-cyberagent.py
 import datetime
 import os
 import io
@@ -189,3 +188,4 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
 
             except Exception as e:
                 response_placeholder.error(f"Framework Error Exception: {e}")
+
