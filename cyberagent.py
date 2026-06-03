@@ -150,32 +150,34 @@ if not st.session_state.authenticated:
     st.stop()
 
 # =====================================================================
-# 4. CHAT STATE & AI BACKEND INITIALIZATION
+# 4. CHAT STATE & GLOBAL CONFIGURATION INITIALIZATION
 # =====================================================================
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-if "chat_session" not in st.session_state:
-    if st.session_state.is_creator:
-        dynamic_instruction = (
-            "You are CyberAgent, speaking directly to your master developer, SHAURYA SRIDHAR. "
-            "Address him with utmost respect as your creator, master, or boss. "
-            "IMPORTANT: Do not spam or repeat his name in every single sentence. Speak naturally "
-            "and conversationally. Keep responses very short and brief so they are pleasant to hear."
-        )
-    else:
-        dynamic_instruction = (
-            f"You are CyberAgent, speaking to a guest user named {st.session_state.active_user}. "
-            "Be polite, helpful, and professional. Always proudly state that your sole creator "
-            "and mastermind developer is SHAURYA SRIDHAR. Keep responses short and brief so they read out loud nicely."
-        )
-
-    agent_config = types.GenerateContentConfig(
-        system_instruction=dynamic_instruction,
-        tools=agent_tools,
-        temperature=0.3
+# FIXED: Extracted dynamic instructions out of the IF block so it is globally available
+if st.session_state.is_creator:
+    dynamic_instruction = (
+        "You are CyberAgent, speaking directly to your master developer, SHAURYA SRIDHAR. "
+        "Address him with utmost respect as your creator, master, or boss. "
+        "IMPORTANT: Do not spam or repeat his name in every single sentence. Speak naturally "
+        "and conversationally. Keep responses very short and brief so they are pleasant to hear."
+    )
+else:
+    dynamic_instruction = (
+        f"You are CyberAgent, speaking to a guest user named {st.session_state.active_user}. "
+        "Be polite, helpful, and professional. Always proudly state that your sole creator "
+        "and mastermind developer is SHAURYA SRIDHAR. Keep responses short and brief so they read out loud nicely."
     )
 
+agent_config = types.GenerateContentConfig(
+    system_instruction=dynamic_instruction,
+    tools=agent_tools,
+    temperature=0.3
+)
+
+# Initialize the chat engine historical object
+if "chat_session" not in st.session_state:
     st.session_state.chat_session = client.chats.create(model=st.session_state.current_model, config=agent_config)
 
 # Render chat messages from history on page refresh
@@ -213,6 +215,7 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
                     if is_retryable and st.session_state.current_model == PRIMARY_MODEL:
                         st.session_state.current_model = BACKUP_MODEL
                         
+                        # Now agent_config is perfectly defined and visible to this block!
                         extracted_history = st.session_state.chat_session.get_history()
                         st.session_state.chat_session = client.chats.create(
                             model=st.session_state.current_model, 
