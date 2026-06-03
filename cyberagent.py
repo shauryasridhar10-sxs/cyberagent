@@ -193,6 +193,8 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
             try:
                 response = st.session_state.chat_session.send_message(user_prompt)
                 agent_reply = response.text
+                
+                # FIXED: Cleanly print the AI response text only, with no manual signature additions!
                 response_placeholder.markdown(agent_reply)
                 st.session_state.messages.append({"role": "assistant", "text": agent_reply})
 
@@ -201,3 +203,4 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
 
             except Exception as e:
                 response_placeholder.error(f"Framework Error Exception: {e}")
+
