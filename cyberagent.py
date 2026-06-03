@@ -109,6 +109,10 @@ def google_search_tool(query: str) -> str:
         # Step 3: Prevent a crash and give a friendly fallback response to the AI model
         return f"Internet lookup pipeline error: {str(e)}. Please suggest the user try searching again in a moment."
 
+
+# Unified tool packaging configuration array
+agent_tools = [get_current_time, python_calculator, google_search_tool]
+
 # =====================================================================
 # 3. INTERACTIVE WEB AUTHENTICATION
 # =====================================================================
@@ -196,4 +200,3 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
 
             except Exception as e:
                 response_placeholder.error(f"Framework Error Exception: {e}")
-
