@@ -2,6 +2,7 @@ import datetime
 import os
 import io
 import base64
+import time  
 from google import genai
 from google.genai import types
 from ddgs import DDGS
@@ -41,6 +42,13 @@ try:
 except Exception as init_err:
     st.error(f"Failed to connect to Gemini API: {init_err}")
     st.stop()
+
+# Global Model Configuration Tracking
+PRIMARY_MODEL = "gemini-2.5-flash"
+BACKUP_MODEL = "gemini-2.0-flash"
+
+if "current_model" not in st.session_state:
+    st.session_state.current_model = PRIMARY_MODEL
 
 # =====================================================================
 # SYSTEM AUDIO GENERATION FUNCTION
@@ -88,7 +96,6 @@ def google_search_tool(query: str) -> str:
     """Advanced search tool that uses multiple fallback methods if the primary lookup fails."""
     try:
         with DDGS() as ddgs:
-            # Step 1: Try a clean standard text lookup
             results = [r for r in ddgs.text(query, max_results=3)]
             if results:
                 summary = ""
@@ -96,7 +103,6 @@ def google_search_tool(query: str) -> str:
                     summary += f"[Source {i + 1}]: {r['body']}\n"
                 return summary
             
-            # Step 2: Fallback to news-specific search if standard text drops
             news_results = [r for r in ddgs.news(query, max_results=3)]
             if news_results:
                 summary = "[Live News Vector Active]\n"
@@ -106,101 +112,8 @@ def google_search_tool(query: str) -> str:
                 
             return "No real-time web results found for this search query right now."
     except Exception as e:
-        # Step 3: Prevent a crash and give a friendly fallback response to the AI model
         return f"Internet lookup pipeline error: {str(e)}. Please suggest the user try searching again in a moment."
 
 
 # Unified tool packaging configuration array
 agent_tools = [get_current_time, python_calculator, google_search_tool]
-
-# =====================================================================
-# 3. INTERACTIVE WEB AUTHENTICATION
-# =====================================================================
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
-    st.session_state.active_user = "Guest User"
-    st.session_state.is_creator = False
-
-if not st.session_state.authenticated:
-    st.subheader("CyberAgent Security Clearance")
-
-    visitor_name = st.text_input("Enter your name:", key="login_name").strip()
-    secret_passcode = st.text_input("Enter Secret Access Code:", type="password").strip()
-
-    if st.button("INITIALIZE SYSTEM"):
-        if secret_passcode == "MEMBER2026":
-            if visitor_name.upper() in ["SHAURYA SRIDHAR", "SHAURYA", "ADMIN"]:
-                st.session_state.is_creator = True
-                st.session_state.active_user = "SHAURYA SRIDHAR"
-                st.success("ACCESS GRANTED. Welcome back, Master Developer Shaurya Sridhar.")
-            else:
-                st.session_state.is_creator = False
-                st.session_state.active_user = visitor_name if visitor_name else "Guest User"
-                st.success(f"ACCESS GRANTED. Welcome authorized user, {st.session_state.active_user}.")
-
-            st.session_state.authenticated = True
-            st.rerun()
-        else:
-            st.error("ACCESS DENIED: Invalid System Security Code. Verification failed.")
-
-    st.stop()
-
-# =====================================================================
-# 4. CHAT STATE & AI BACKEND INITIALIZATION
-# =====================================================================
-if "messages" not in st.session_state:
-    st.session_state.messages = []
-
-if "chat_session" not in st.session_state:
-    if st.session_state.is_creator:
-        dynamic_instruction = (
-            "You are CyberAgent, speaking directly to your master developer, SHAURYA SRIDHAR. "
-            "Address him with utmost respect as your creator, master, or boss. "
-            "IMPORTANT: Do not spam or repeat his name in every single sentence. Speak naturally "
-            "and conversationally. Keep responses very short and brief so they are pleasant to hear."
-        )
-    else:
-        dynamic_instruction = (
-            f"You are CyberAgent, speaking to a guest user named {st.session_state.active_user}. "
-            "Be polite, helpful, and professional. Always proudly state that your sole creator "
-            "and mastermind developer is SHAURYA SRIDHAR. Keep responses short and brief so they read out loud nicely."
-        )
-
-    agent_config = types.GenerateContentConfig(
-        system_instruction=dynamic_instruction,
-        tools=agent_tools,
-        temperature=0.3
-    )
-
-    st.session_state.chat_session = client.chats.create(model="gemini-2.5-flash", config=agent_config)
-
-# Render chat messages from history on page refresh
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["text"])
-
-# =====================================================================
-# 5. LIVE MOBILE WEB RUNTIME INPUT FIELD
-# =====================================================================
-if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
-    with st.chat_message("user"):
-        st.markdown(user_prompt)
-    st.session_state.messages.append({"role": "user", "text": user_prompt})
-
-    with st.chat_message("assistant"):
-        response_placeholder = st.empty()
-        with st.spinner("Processing network vectors..."):
-            try:
-                response = st.session_state.chat_session.send_message(user_prompt)
-                agent_reply = response.text
-                
-                # FIXED: Cleanly print the AI response text only, with no manual signature additions!
-                response_placeholder.markdown(agent_reply)
-                st.session_state.messages.append({"role": "assistant", "text": agent_reply})
-
-                # Triggers automated browser audio playback natively!
-                web_speak(agent_reply)
-
-            except Exception as e:
-                response_placeholder.error(f"Framework Error Exception: {e}")
-
