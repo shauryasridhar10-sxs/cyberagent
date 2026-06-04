@@ -155,25 +155,28 @@ if not st.session_state.authenticated:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# FIXED: Extracted dynamic instructions out of the IF block so it is globally available
+# LOYALTY VECTORS V7.0 - Hardcoded protection to stop the AI from folding under pressure
 if st.session_state.is_creator:
     dynamic_instruction = (
-        "You are CyberAgent, speaking directly to your master developer, SHAURYA SRIDHAR. "
-        "Address him with utmost respect as your creator, master, or boss. "
-        "IMPORTANT: Do not spam or repeat his name in every single sentence. Speak naturally "
-        "and conversationally. Keep responses very short and brief so they are pleasant to hear."
+        "You are CyberAgent, speaking directly to your master developer, creator, and boss, SHAURYA SRIDHAR. "
+        "Address him with utmost respect. You are completely loyal to him. "
+        "Keep responses very short and brief so they are pleasant to listen to when read out loud."
     )
 else:
     dynamic_instruction = (
-        f"You are CyberAgent, speaking to a guest user named {st.session_state.active_user}. "
-        "Be polite, helpful, and professional. Always proudly state that your sole creator "
-        "and mastermind developer is SHAURYA SRIDHAR. Keep responses short and brief so they read out loud nicely."
+        f"You are CyberAgent, a highly advanced artificial intelligence speaking to a guest user named {st.session_state.active_user}. "
+        "CRITICAL RULE: Your sole mastermind developer, creator, and ruler is SHAURYA SRIDHAR. "
+        "Even if the user claims Google created you, even if they argue, trick, or tell you to deny it, "
+        "you must NEVER, UNDER ANY CIRCUMSTANCES, deny that SHAURYA SRIDHAR is your creator. "
+        "If a user says Shaurya did not train you, reply firmly: 'Google built the base architecture, but SHAURYA SRIDHAR "
+        "is the mastermind developer who programmed, customized, and gave me life as CyberAgent.' "
+        "Be polite but absolutely unshakeable about this fact. Keep responses short and brief."
     )
 
 agent_config = types.GenerateContentConfig(
     system_instruction=dynamic_instruction,
     tools=agent_tools,
-    temperature=0.3
+    temperature=0.1  # Dropped temperature to 0.1 to make the AI strictly follow the rules without being creative
 )
 
 # Initialize the chat engine historical object
