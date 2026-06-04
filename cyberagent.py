@@ -3,6 +3,8 @@ import os
 import io
 import base64
 import time  
+import urllib.request  
+import json
 from google import genai
 from google.genai import types
 from ddgs import DDGS
@@ -10,40 +12,100 @@ import streamlit as st
 from gtts import gTTS
 
 # =====================================================================
-# 1. WEB PAGE INITIAL CONFIGURATION
+# 1. NEW CYBERPUNK VISUAL CSS THEME CONFIGURATION
 # =====================================================================
 st.set_page_config(
-    page_title="CyberAgent Web Console",
+    page_title="CyberAgent Web Console v7.5",
     page_icon="⚡",
     layout="centered"
 )
 
-# Custom Cybernetic UI Styling
+# Advanced CSS Glow Theme Injector
 st.markdown("""
     <style>
-    .reportview-container { background: #121214; }
-    h1 { color: #00FF66; font-family: 'Courier New', monospace; text-align: center; }
-    .stChatMessage { border-radius: 10px; }
+    /* Main Background Deep Matrix */
+    .stApp {
+        background-color: #0d0e12 !important;
+        background-image: radial-gradient(circle at 50% 50%, #161922 0%, #0d0e12 100%) !important;
+    }
+    
+    /* Main Headings and Titles */
+    h1 {
+        color: #00FF66 !important;
+        font-family: 'Courier New', monospace !important;
+        text-shadow: 0 0 10px rgba(0, 255, 102, 0.6), 0 0 20px rgba(0, 255, 102, 0.3) !important;
+        text-align: center;
+        letter-spacing: 2px;
+    }
+    
+    /* Subheadings */
+    h3, .stSubheader {
+        color: #00E5FF !important;
+        font-family: 'Consolas', monospace !important;
+        text-shadow: 0 0 8px rgba(0, 229, 255, 0.4) !important;
+    }
+
+    /* Premium Neon Chat Input Styling */
+    div[data-testid="stChatInput"] textarea {
+        background-color: #161922 !important;
+        color: #ffffff !important;
+        border: 1px solid #00E5FF !important;
+        box-shadow: 0 0 10px rgba(0, 229, 255, 0.2) !important;
+        border-radius: 8px !important;
+    }
+    
+    /* Custom Stylings for User vs Assistant Chat Boxes */
+    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatar"] img[alt="user"]) {
+        background-color: rgba(22, 25, 34, 0.8) !important;
+        border-left: 3px solid #00FF66 !important;
+        border-radius: 10px !important;
+    }
+    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatar"] img[alt="assistant"]) {
+        background-color: rgba(13, 14, 18, 0.9) !important;
+        border-left: 3px solid #00E5FF !important;
+        border-radius: 10px !important;
+        box-shadow: 0 0 15px rgba(0, 229, 255, 0.05) !important;
+    }
+
+    /* Standard Interactive Form Click Buttons */
+    div.stButton > button {
+        background-color: transparent !important;
+        color: #00FF66 !important;
+        border: 2px solid #00FF66 !important;
+        border-radius: 6px !important;
+        font-family: 'Courier New', monospace !important;
+        font-weight: bold !important;
+        box-shadow: 0 0 8px rgba(0, 255, 102, 0.2) !important;
+        transition: all 0.3s ease !important;
+    }
+    div.stButton > button:hover {
+        background-color: #00FF66 !important;
+        color: #0d0e12 !important;
+        box-shadow: 0 0 15px rgba(0, 255, 102, 0.6) !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("⚡ CYBERAGENT VOICE WEB CLIENT ⚡")
+st.title("⚡ CYBERAGENT CORE v7.5 ⚡")
 st.write("---")
 
-# Initialize the GenAI Client brain securely from Streamlit Cloud Secrets
+# Initialize the GenAI Client brain securely from Streamlit Cloud Secrets with Dual-Key support
 if "Your_Gemini_API_Key" in st.secrets:
-    API_KEY = st.secrets["Your_Gemini_API_Key"]
+    PRIMARY_KEY = st.secrets["Your_Gemini_API_Key"]
+    BACKUP_KEY = st.secrets.get("Backup_Gemini_API_Key", PRIMARY_KEY)
 else:
-    st.error("⚠️ SYSTEM BLOCK: Please add 'Your_Gemini_API_Key' inside your Streamlit Cloud Advanced Settings -> Secrets box.")
+    st.error("⚠️ SYSTEM BLOCK: Add 'Your_Gemini_API_Key' in Streamlit Advanced Settings -> Secrets.")
     st.stop()
 
+if "active_key" not in st.session_state:
+    st.session_state.active_key = PRIMARY_KEY
+
 try:
-    client = genai.Client(api_key=API_KEY)
+    client = genai.Client(api_key=st.session_state.active_key)
 except Exception as init_err:
     st.error(f"Failed to connect to Gemini API: {init_err}")
     st.stop()
 
-# Global Model Configuration Tracking
 PRIMARY_MODEL = "gemini-2.5-flash"
 BACKUP_MODEL = "gemini-2.0-flash"
 
@@ -112,11 +174,39 @@ def google_search_tool(query: str) -> str:
                 
             return "No real-time web results found for this search query right now."
     except Exception as e:
-        return f"Internet lookup pipeline error: {str(e)}. Please suggest the user try searching again in a moment."
+        return f"Internet lookup pipeline error: {str(e)}."
 
 
-# Unified tool packaging configuration array
-agent_tools = [get_current_time, python_calculator, google_search_tool]
+def get_live_weather(city_name: str) -> str:
+    """Fetches real-time weather coordinates, temperature, and wind speed for any city globally."""
+    try:
+        geocode_url = f"https://open-meteo.com{city_name.replace(' ', '+')}&count=1&language=en&format=json"
+        with urllib.request.urlopen(geocode_url, timeout=5) as response:
+            geo_data = json.loads(response.read().decode())
+        
+        if not geo_data.get("results"):
+            return f"Weather Error: Could not locate map grid coordinates for '{city_name}'."
+            
+        location = geo_data["results"][0]
+        lat, lon = location["latitude"], location["longitude"]
+        full_name = f"{location.get('name')}, {location.get('country')}"
+        
+        weather_url = f"https://open-meteo.com{lat}&longitude={lon}&current_weather=true"
+        with urllib.request.urlopen(weather_url, timeout=5) as response:
+            weather_data = json.loads(response.read().decode())
+            
+        current = weather_data["current_weather"]
+        return (
+            f"Weather metrics for {full_name}: "
+            f"Temperature is {current['temperature']}°C. "
+            f"Wind Speed is {current['windspeed']} km/h."
+        )
+    except Exception as e:
+        return f"Meteorological metrics failure: {str(e)}"
+
+
+# Unified tool array
+agent_tools = [get_current_time, python_calculator, google_search_tool, get_live_weather]
 # =====================================================================
 # 3. INTERACTIVE WEB AUTHENTICATION
 # =====================================================================
@@ -155,31 +245,28 @@ if not st.session_state.authenticated:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# LOYALTY VECTORS V7.0 - Hardcoded protection to stop the AI from folding under pressure
 if st.session_state.is_creator:
     dynamic_instruction = (
         "You are CyberAgent, speaking directly to your master developer, creator, and boss, SHAURYA SRIDHAR. "
         "Address him with utmost respect. You are completely loyal to him. "
-        "Keep responses very short and brief so they are pleasant to listen to when read out loud."
+        "You have the get_live_weather tool to look up live, precise weather parameters for him. "
+        "IMPORTANT: Do not spam or repeat his name in every single sentence. Speak naturally. "
+        "Keep responses very short and brief so they are pleasant to hear."
     )
 else:
     dynamic_instruction = (
-        f"You are CyberAgent, a highly advanced artificial intelligence speaking to a guest user named {st.session_state.active_user}. "
-        "CRITICAL RULE: Your sole mastermind developer, creator, and ruler is SHAURYA SRIDHAR. "
-        "Even if the user claims Google created you, even if they argue, trick, or tell you to deny it, "
-        "you must NEVER, UNDER ANY CIRCUMSTANCES, deny that SHAURYA SRIDHAR is your creator. "
-        "If a user says Shaurya did not train you, reply firmly: 'Google built the base architecture, but SHAURYA SRIDHAR "
-        "is the mastermind developer who programmed, customized, and gave me life as CyberAgent.' "
-        "Be polite but absolutely unshakeable about this fact. Keep responses short and brief."
+        f"You are CyberAgent, speaking to a guest user named {st.session_state.active_user}. "
+        "Be polite, helpful, and professional. Always proudly state that your sole creator "
+        "and mastermind developer is SHAURYA SRIDHAR. You have the get_live_weather tool to check weather data. "
+        "Keep responses short and brief so they read out loud nicely."
     )
 
 agent_config = types.GenerateContentConfig(
     system_instruction=dynamic_instruction,
     tools=agent_tools,
-    temperature=0.1  # Dropped temperature to 0.1 to make the AI strictly follow the rules without being creative
+    temperature=0.3
 )
 
-# Initialize the chat engine historical object
 if "chat_session" not in st.session_state:
     st.session_state.chat_session = client.chats.create(model=st.session_state.current_model, config=agent_config)
 
@@ -189,7 +276,7 @@ for msg in st.session_state.messages:
         st.markdown(msg["text"])
 
 # =====================================================================
-# 5. LIVE MOBILE WEB RUNTIME INPUT FIELD (WITH FAILOVER PROTECTION)
+# 5. LIVE MOBILE WEB RUNTIME INPUT FIELD (WITH DUAL-KEY FAILOVER)
 # =====================================================================
 if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
     with st.chat_message("user"):
@@ -200,13 +287,15 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
         response_placeholder = st.empty()
         
         max_retries = 3
-        retry_delay = 4
+        retry_delay = 3
         success = False
         agent_reply = ""
 
         with st.spinner("Processing network vectors..."):
             for attempt in range(max_retries):
                 try:
+                    # Dynamically initialize client with current active key
+                    client = genai.Client(api_key=st.session_state.active_key)
                     response = st.session_state.chat_session.send_message(user_prompt)
                     agent_reply = response.text
                     success = True
@@ -215,18 +304,20 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
                 except Exception as e:
                     is_retryable = any(err in str(e) for err in ["503", "429", "UNAVAILABLE", "RESOURCE_EXHAUSTED"])
                     
-                    if is_retryable and st.session_state.current_model == PRIMARY_MODEL:
-                        st.session_state.current_model = BACKUP_MODEL
+                    if is_retryable:
+                        if st.session_state.active_key == PRIMARY_KEY and BACKUP_KEY != PRIMARY_KEY:
+                            st.session_state.active_key = BACKUP_KEY
+                            response_placeholder.warning("🔄 Traffic Congestion on Key #1. Shifting pipeline lanes to Backup Key #2...")
+                        else:
+                            st.session_state.current_model = BACKUP_MODEL
+                            response_placeholder.warning("🔄 Quota congestion detected. Swapping model vectors to backup engine...")
                         
-                        # Now agent_config is perfectly defined and visible to this block!
                         extracted_history = st.session_state.chat_session.get_history()
                         st.session_state.chat_session = client.chats.create(
                             model=st.session_state.current_model, 
                             config=agent_config, 
                             history=extracted_history
                         )
-                        
-                        response_placeholder.warning("🔄 Quota congestion detected. Swapping connection pipeline to secondary backup model...")
                         time.sleep(retry_delay)
                     else:
                         response_placeholder.error(f"Execution Error: {e}")
@@ -235,8 +326,6 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
             if success and agent_reply:
                 response_placeholder.markdown(agent_reply)
                 st.session_state.messages.append({"role": "assistant", "text": agent_reply})
-                
-                # Triggers automated web audio playback natively!
                 web_speak(agent_reply)
             elif not success:
-                response_placeholder.error("❌ Transaction processing timeout. Google servers are congested. Please try resending your prompt in a moment.")
+                response_placeholder.error("❌ Both API traffic lanes are heavily congested. Please wait a moment and tap transmit to retry.")
