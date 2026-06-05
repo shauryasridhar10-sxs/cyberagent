@@ -270,20 +270,25 @@ agent_config = types.GenerateContentConfig(
 if "chat_session" not in st.session_state:
     st.session_state.chat_session = client.chats.create(model=st.session_state.current_model, config=agent_config)
 
-# Render chat messages from history on page refresh
+# Global reference to your brand new premium logo vector
+LOGO_URL = "https://squarespace-cdn.com"
+
+# Render chat messages from history with your official custom logo icon!
 for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
+    avatar_icon = LOGO_URL if msg["role"] == "assistant" else "👤"
+    with st.chat_message(msg["role"], avatar=avatar_icon):
         st.markdown(msg["text"])
 
 # =====================================================================
-# 5. LIVE MOBILE WEB RUNTIME INPUT FIELD (WITH DUAL-KEY FAILOVER)
+# 5. LIVE MOBILE WEB RUNTIME INPUT FIELD (WITH PREMIUM LOGO AVATAR)
 # =====================================================================
 if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar="👤"):
         st.markdown(user_prompt)
     st.session_state.messages.append({"role": "user", "text": user_prompt})
 
-    with st.chat_message("assistant"):
+    # Display the AI response using your premium logo profile asset
+    with st.chat_message("assistant", avatar=LOGO_URL):
         response_placeholder = st.empty()
         
         max_retries = 3
@@ -294,7 +299,6 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
         with st.spinner("Processing network vectors..."):
             for attempt in range(max_retries):
                 try:
-                    # Dynamically initialize client with current active key
                     client = genai.Client(api_key=st.session_state.active_key)
                     response = st.session_state.chat_session.send_message(user_prompt)
                     agent_reply = response.text
