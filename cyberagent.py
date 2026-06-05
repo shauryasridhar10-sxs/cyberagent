@@ -187,7 +187,7 @@ def get_live_weather(city_name: str) -> str:
         if not geo_data.get("results"):
             return f"Weather Error: Could not locate map grid coordinates for '{city_name}'."
             
-        location = geo_data["results"][0]
+        location = geo_data["results"]
         lat, lon = location["latitude"], location["longitude"]
         full_name = f"{location.get('name')}, {location.get('country')}"
         
@@ -205,7 +205,7 @@ def get_live_weather(city_name: str) -> str:
         return f"Meteorological metrics failure: {str(e)}"
 
 
-# Unified tool array
+# Unified tool packaging configuration array including the weather tool
 agent_tools = [get_current_time, python_calculator, google_search_tool, get_live_weather]
 # =====================================================================
 # 3. INTERACTIVE WEB AUTHENTICATION (WITH ANIMATED CYBERPUNK BANNER)
@@ -283,7 +283,6 @@ if st.session_state.is_creator:
         "IMPORTANT: Do not spam or repeat his name in every single sentence. Speak naturally. "
         "Keep responses very short and brief so they are pleasant to hear."
     )
-    # The default initial welcoming text statement assigned to the Master Creator
     initial_greeting = f"System vectors initialized successfully. Greetings, Master SHAURYA SRIDHAR. CyberAgent console online and fully loyal. How may I assist your development matrix today?"
 else:
     dynamic_instruction = (
@@ -292,7 +291,6 @@ else:
         "and mastermind developer is SHAURYA SRIDHAR. You have the get_live_weather tool to check weather data. "
         "Keep responses short and brief so they read out loud nicely."
     )
-    # The default initial welcoming text statement assigned to the Guest Profiles
     initial_greeting = f"Welcome authorized system user, {st.session_state.active_user}. Core engines operational. I am CyberAgent, and my mastermind creator is SHAURYA SRIDHAR. Standing by for parameters..."
 
 agent_config = types.GenerateContentConfig(
@@ -302,16 +300,15 @@ agent_config = types.GenerateContentConfig(
 )
 
 if "chat_session" not in st.session_state:
-    st.session_state.chat_session = client.chats.create(model=st.session_state.current_model, config=agent_config)
+    st.session_state.chat_session = client.chats.create(model="gemini-2.5-flash", config=agent_config)
 
-# FIXED: Inject the first proactive greeting statement if the chat database history memory is currently empty
+# Inject the first proactive greeting statement if the chat history memory is empty
 if len(st.session_state.messages) == 0:
     st.session_state.messages.append({"role": "assistant", "text": initial_greeting})
-    # Force immediate voice synthesis initialization on page boot
     web_speak(initial_greeting)
 
-# Global reference to your brand new premium logo vector
-LOGO_URL = "https://squarespace-cdn.com"
+# Global reference to your premium logo vector directly from your repo
+LOGO_URL = "https://githubusercontent.com"
 
 # Render chat messages from history on page refresh
 for msg in st.session_state.messages:
