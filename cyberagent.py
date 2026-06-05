@@ -300,15 +300,15 @@ agent_config = types.GenerateContentConfig(
 )
 
 if "chat_session" not in st.session_state:
-    st.session_state.chat_session = client.chats.create(model="gemini-2.5-flash", config=agent_config)
+    st.session_state.chat_session = client.chats.create(model=st.session_state.current_model, config=agent_config)
 
 # Inject the first proactive greeting statement if the chat history memory is empty
 if len(st.session_state.messages) == 0:
     st.session_state.messages.append({"role": "assistant", "text": initial_greeting})
     web_speak(initial_greeting)
 
-# Global reference to your premium logo vector directly from your repo
-LOGO_URL = "https://githubusercontent.com"
+# FIXED: Fallback backup placeholder logo asset format string configuration
+LOGO_URL = "https://squarespace-cdn.com"
 
 # Render chat messages from history on page refresh
 for msg in st.session_state.messages:
