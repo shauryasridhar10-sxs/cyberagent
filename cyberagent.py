@@ -10,6 +10,7 @@ from google.genai import types
 from ddgs import DDGS
 import streamlit as st
 from gtts import gTTS
+from PIL import Image  # Added for ultra-smooth image scaling protection
 
 # =====================================================================
 # 1. NEW CYBERPUNK VISUAL CSS THEME CONFIGURATION
@@ -113,6 +114,28 @@ if "current_model" not in st.session_state:
     st.session_state.current_model = PRIMARY_MODEL
 
 # =====================================================================
+# FIXED: AUTOMATED LOGO DOWNLOAD & IMAGE OPTIMIZATION PIPELINE
+# =====================================================================
+@st.cache_data(show_spinner=False)
+def load_and_scale_logo() -> Image.Image:
+    """Downloads your high-res logo and downscales it safely so Streamlit can render it instantly."""
+    try:
+        raw_url = "https://githubusercontent.com"
+        req = urllib.request.Request(raw_url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            img_data = response.read()
+        # Compress and scale image down perfectly for a chat profile bubble icon
+        img = Image.open(io.BytesIO(img_data))
+        img.thumbnail((128, 128))
+        return img
+    except Exception:
+        # Emergency backup icon if GitHub connection drops
+        return "⚡"
+
+# Initialize scaled layout asset globally
+LOGO_ASSET = load_and_scale_logo()
+
+# =====================================================================
 # SYSTEM AUDIO GENERATION FUNCTION
 # =====================================================================
 def web_speak(text: str):
@@ -205,7 +228,7 @@ def get_live_weather(city_name: str) -> str:
         return f"Meteorological metrics failure: {str(e)}"
 
 
-# Unified tool packaging configuration array including the weather tool
+# Unified tool packaging configuration array
 agent_tools = [get_current_time, python_calculator, google_search_tool, get_live_weather]
 # =====================================================================
 # 3. INTERACTIVE WEB AUTHENTICATION (WITH ANIMATED CYBERPUNK BANNER)
@@ -300,19 +323,16 @@ agent_config = types.GenerateContentConfig(
 )
 
 if "chat_session" not in st.session_state:
-    st.session_state.chat_session = client.chats.create(model=st.session_state.current_model, config=agent_config)
+    st.session_state.chat_session = client.chats.create(model="gemini-2.5-flash", config=agent_config)
 
 # Inject the first proactive greeting statement if the chat history memory is empty
 if len(st.session_state.messages) == 0:
     st.session_state.messages.append({"role": "assistant", "text": initial_greeting})
     web_speak(initial_greeting)
 
-# FIXED: Fallback backup placeholder logo asset format string configuration
-LOGO_URL = "https://squarespace-cdn.com"
-
-# Render chat messages from history on page refresh
+# Render chat messages from history with optimized local avatar objects
 for msg in st.session_state.messages:
-    avatar_icon = LOGO_URL if msg["role"] == "assistant" else "👤"
+    avatar_icon = LOGO_ASSET if msg["role"] == "assistant" else "👤"
     with st.chat_message(msg["role"], avatar=avatar_icon):
         st.markdown(msg["text"])
 
@@ -324,7 +344,8 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
         st.markdown(user_prompt)
     st.session_state.messages.append({"role": "user", "text": user_prompt})
 
-    with st.chat_message("assistant", avatar=LOGO_URL):
+    # Display response bound directly to your pixel-optimized logo asset
+    with st.chat_message("assistant", avatar=LOGO_ASSET):
         response_placeholder = st.empty()
         
         max_retries = 3
