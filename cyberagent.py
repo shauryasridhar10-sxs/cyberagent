@@ -208,7 +208,7 @@ def get_live_weather(city_name: str) -> str:
 # Unified tool array
 agent_tools = [get_current_time, python_calculator, google_search_tool, get_live_weather]
 # =====================================================================
-# 3. INTERACTIVE WEB AUTHENTICATION
+# 3. INTERACTIVE WEB AUTHENTICATION (WITH ANIMATED CYBERPUNK BANNER)
 # =====================================================================
 if "authenticated" not in st.session_state:
     st.session_state.authenticated = False
@@ -216,6 +216,36 @@ if "authenticated" not in st.session_state:
     st.session_state.is_creator = False
 
 if not st.session_state.authenticated:
+    # Injecting the CSS keyframe blinking loader animation
+    st.markdown("""
+        <style>
+        @keyframes cyberPulse {
+            0% { opacity: 0.3; text-shadow: 0 0 4px #00FF66; }
+            50% { opacity: 1.0; text-shadow: 0 0 15px #00FF66, 0 0 30px #00FF66; }
+            100% { opacity: 0.3; text-shadow: 0 0 4px #00FF66; }
+        }
+        .cyber-banner {
+            font-family: 'Courier New', monospace;
+            color: #00FF66;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            background-color: #161922;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px dashed #00FF66;
+            margin-bottom: 25px;
+            animation: cyberPulse 2s infinite;
+        }
+        </style>
+        <div class="cyber-banner">
+            🚀 SYSTEM INITIALIZATION IN PROGRESS...<br>
+            [📡 CONNECTING TO CORE DATAFRAME VECTORS...]<br>
+            [🔐 ENCRYPTING SHAURYA'S PRIVATE FIREWALL...]<br>
+            [🧠 MATRIX STANDING BY FOR AUTHORIZATION]
+        </div>
+        """, unsafe_allow_html=True)
+
     st.subheader("CyberAgent Security Clearance")
 
     visitor_name = st.text_input("Enter your name:", key="login_name").strip()
@@ -253,6 +283,8 @@ if st.session_state.is_creator:
         "IMPORTANT: Do not spam or repeat his name in every single sentence. Speak naturally. "
         "Keep responses very short and brief so they are pleasant to hear."
     )
+    # The default initial welcoming text statement assigned to the Master Creator
+    initial_greeting = f"System vectors initialized successfully. Greetings, Master SHAURYA SRIDHAR. CyberAgent console online and fully loyal. How may I assist your development matrix today?"
 else:
     dynamic_instruction = (
         f"You are CyberAgent, speaking to a guest user named {st.session_state.active_user}. "
@@ -260,6 +292,8 @@ else:
         "and mastermind developer is SHAURYA SRIDHAR. You have the get_live_weather tool to check weather data. "
         "Keep responses short and brief so they read out loud nicely."
     )
+    # The default initial welcoming text statement assigned to the Guest Profiles
+    initial_greeting = f"Welcome authorized system user, {st.session_state.active_user}. Core engines operational. I am CyberAgent, and my mastermind creator is SHAURYA SRIDHAR. Standing by for parameters..."
 
 agent_config = types.GenerateContentConfig(
     system_instruction=dynamic_instruction,
@@ -270,24 +304,29 @@ agent_config = types.GenerateContentConfig(
 if "chat_session" not in st.session_state:
     st.session_state.chat_session = client.chats.create(model=st.session_state.current_model, config=agent_config)
 
+# FIXED: Inject the first proactive greeting statement if the chat database history memory is currently empty
+if len(st.session_state.messages) == 0:
+    st.session_state.messages.append({"role": "assistant", "text": initial_greeting})
+    # Force immediate voice synthesis initialization on page boot
+    web_speak(initial_greeting)
+
 # Global reference to your brand new premium logo vector
 LOGO_URL = "https://squarespace-cdn.com"
 
-# Render chat messages from history with your official custom logo icon!
+# Render chat messages from history on page refresh
 for msg in st.session_state.messages:
     avatar_icon = LOGO_URL if msg["role"] == "assistant" else "👤"
     with st.chat_message(msg["role"], avatar=avatar_icon):
         st.markdown(msg["text"])
 
 # =====================================================================
-# 5. LIVE MOBILE WEB RUNTIME INPUT FIELD (WITH PREMIUM LOGO AVATAR)
+# 5. LIVE MOBILE WEB RUNTIME INPUT FIELD (WITH DUAL-KEY FAILOVER)
 # =====================================================================
 if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
     with st.chat_message("user", avatar="👤"):
         st.markdown(user_prompt)
     st.session_state.messages.append({"role": "user", "text": user_prompt})
 
-    # Display the AI response using your premium logo profile asset
     with st.chat_message("assistant", avatar=LOGO_URL):
         response_placeholder = st.empty()
         
