@@ -324,7 +324,7 @@ if "chat_session" not in st.session_state or st.session_state.last_checked_user 
     st.session_state.last_checked_user = st.session_state.active_user  
     web_speak(initial_greeting)
 
-# Global reference to your lightning logo asset configuration
+# Global reference to your thunder bolt logo asset configuration
 LOGO_URL = LOGO_ASSET
 
 # Render chat messages from history on page refresh
@@ -335,51 +335,20 @@ for msg in st.session_state.messages:
 
 
 # =====================================================================
-# FIXED BACKUP FAILOVER HOOK: SAFELY PARSES BOTH RAW TEXT AND JSON
+# FIXED UNBROKEN BACKUP FAILOVER HOOK: DUCKDUCKGO ZERO-KEY AI ENGINE
 # =====================================================================
-def call_openrouter_backup(prompt: str, instruction: str) -> str:
-    """Connects to OpenRouter using requests and safely reads both JSON and raw text data."""
-    if not OPENROUTER_KEY:
-        return "⚠️ CRITICAL ERR: Primary engine is frozen and no OpenRouter backup key is configured in settings."
+def call_duckduckgo_backup(prompt: str, instruction: str) -> str:
+    """Connects directly to DuckDuckGo's internal unblocked pool to run Llama-3 if Google drops."""
     try:
-        url = "https://openrouter.ai"
-        headers = {
-            "Authorization": f"Bearer {OPENROUTER_KEY}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://streamlit.app",
-            "X-Title": "CyberAgent Web Client Console",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        }
-        data = {
-            "model": "openchat/openchat-7b:free",
-            "messages": [
-                {"role": "system", "content": instruction},
-                {"role": "user", "content": prompt}
-            ]
-        }
-        
-        # Dispatch transaction payload vector
-        response = requests.post(url, json=data, headers=headers, timeout=10)
-        
-        # FIXED: Check if the response is empty or formatted incorrectly before parsing JSON
-        if not response.text:
-            return "⚠️ OpenRouter returned an empty connection stream. Please resend your prompt in a moment."
-            
-        try:
-            res_data = response.json()
-            if "choices" in res_data:
-                return res_data["choices"][0]["message"]["content"]
-            elif "error" in res_data:
-                return f"⚠️ OpenRouter Engine Quota Notice: {res_data['error'].get('message')}"
-            return f"Raw System Response Matrix: {response.text[:200]}"
-        except ValueError:
-            # Fallback to display the raw text directly if the server returns a non-JSON page
-            if "Forbidden" in response.text or "Cloudflare" in response.text:
-                return "❌ Shared Server Congestion: OpenRouter has flagged the public Streamlit IP address. Please pause for 30 seconds and try again."
-            return f"Raw Connection Pipeline Broadcast: {response.text[:150]}"
-            
-    except Exception as router_err:
-        return f"❌ Mainframe Network Collapse: Backup engine failed: {str(router_err)}"
+        with DDGS() as ddgs:
+            # Passes your instruction matrix seamlessly onto Meta Llama 3 on an open IP lane
+            full_prompt = f"[System Context: {instruction}]\nUser Matrix Parameter: {prompt}"
+            response = ddgs.chat(full_prompt, model='llama-3-70b')
+            if response:
+                return str(response)
+            return "⚠️ Connection state returned empty. Please resend parameters."
+    except Exception as ddg_err:
+        return f"❌ Mainframe Network Collapse: Both Google and Backup Lanes are entirely locked: {str(ddg_err)}"
 
 
 # =====================================================================
@@ -395,7 +364,7 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
         
         with st.spinner("Processing network vectors..."):
             try:
-                # Step 1: Attempt normal communication through Google Gemini pipelines
+                # Step 1: Attempt standard communication through Google Gemini pipelines
                 response = st.session_state.chat_session.send_message(user_prompt)
                 agent_reply = response.text
                 
@@ -407,12 +376,13 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
                 error_msg = str(e)
                 is_congested = any(err in error_msg for err in ["429", "RESOURCE_EXHAUSTED", "503", "UNAVAILABLE"])
                 
-                if is_congested and OPENROUTER_KEY:
-                    response_placeholder.warning("🔄 Google Mainframe congested. Routing data vectors through OpenRouter backup...")
+                if is_congested:
+                    response_placeholder.warning("🔄 Google Mainframe congested. Rerouting data vectors through unblocked backup core...")
                     
-                    # Execute failover call directly onto Meta Llama 3 core masked pipeline
-                    agent_reply = call_openrouter_backup(user_prompt, dynamic_instruction)
+                    # Execute failover call directly onto DuckDuckGo's Meta Llama 3 engine pool
+                    agent_reply = call_duckduckgo_backup(user_prompt, dynamic_instruction)
                     
+                    # Clear out warning overlay and display clean response text
                     response_placeholder.markdown(agent_reply)
                     st.session_state.messages.append({"role": "assistant", "text": agent_reply})
                     web_speak(agent_reply)
