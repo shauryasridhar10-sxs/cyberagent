@@ -16,7 +16,7 @@ from PIL import Image
 # 1. ULTRAMODERN CYBERNETIC GRID THEME CONFIGURATION
 # =====================================================================
 st.set_page_config(
-    page_title="CyberAgent Mainframe v8.0",
+    page_title="CyberAgent Mainframe v8.5",
     page_icon="⚡",
     layout="centered"
 )
@@ -24,7 +24,6 @@ st.set_page_config(
 # Advanced CSS Holographic Interface Injector
 st.markdown("""
     <style>
-    /* Dark Digital Mainframe Background with Subtle Tech Grid Overlay */
     .stApp {
         background-color: #06070a !important;
         background-image: 
@@ -33,8 +32,6 @@ st.markdown("""
             radial-gradient(circle at 50% 30%, #101524 0%, #06070a 100%) !important;
         background-size: 30px 30px, 30px 30px, auto !important;
     }
-    
-    /* Glowing Neon Main Title */
     h1 {
         color: #00FF66 !important;
         font-family: 'Courier New', monospace !important;
@@ -44,16 +41,12 @@ st.markdown("""
         letter-spacing: 4px;
         text-transform: uppercase;
     }
-    
-    /* Holographic Cyan Subheadings */
     h3, .stSubheader {
         color: #00E5FF !important;
         font-family: 'Consolas', monospace !important;
         text-shadow: 0 0 10px rgba(0, 229, 255, 0.5) !important;
         letter-spacing: 1px;
     }
-
-    /* Premium Neon Chat Input Styling */
     div[data-testid="stChatInput"] textarea, div[data-testid="stTextInput"] input {
         background-color: #0c0f17 !important;
         color: #00E5FF !important;
@@ -61,41 +54,25 @@ st.markdown("""
         border: 1px solid #00E5FF !important;
         box-shadow: 0 0 15px rgba(0, 229, 255, 0.15) !important;
         border-radius: 4px !important;
-        transition: all 0.3s ease;
     }
-    div[data-testid="stChatInput"] textarea:focus, div[data-testid="stTextInput"] input:focus {
-        border: 1px solid #00FF66 !important;
-        box-shadow: 0 0 20px rgba(0, 255, 102, 0.3) !important;
-    }
-    
-    /* User Chat Bubble - Sleek Tactical Green Border */
     div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatar"] img[alt="user"]) {
         background-color: rgba(12, 15, 23, 0.85) !important;
         border: 1px solid rgba(0, 255, 102, 0.2) !important;
         border-left: 4px solid #00FF66 !important;
         border-radius: 4px !important;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
     }
-    
-    /* Assistant Chat Bubble - High-Tech Holographic Cyan Border */
     div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatar"]) {
         background-color: rgba(8, 10, 15, 0.9) !important;
         border: 1px solid rgba(0, 229, 255, 0.2) !important;
         border-left: 4px solid #00E5FF !important;
         border-radius: 4px !important;
-        box-shadow: 0 4px 15px rgba(0, 229, 255, 0.05) !important;
     }
-
-    /* Interactive Command Terminal Buttons */
     div.stButton > button {
         background-color: rgba(0, 255, 102, 0.05) !important;
         color: #00FF66 !important;
         border: 1px solid #00FF66 !important;
         border-radius: 4px !important;
         font-family: 'Courier New', monospace !important;
-        font-weight: bold !important;
-        letter-spacing: 1px;
-        box-shadow: 0 0 10px rgba(0, 255, 102, 0.1) !important;
         transition: all 0.3s ease !important;
         width: 100%;
     }
@@ -103,35 +80,30 @@ st.markdown("""
         background-color: #00FF66 !important;
         color: #06070a !important;
         box-shadow: 0 0 20px rgba(0, 255, 102, 0.7) !important;
-        transform: translateY(-1px);
     }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("⚡ CYBERAGENT CORE v8.0 ⚡")
+st.title("⚡ CYBERAGENT CORE v8.5 ⚡")
 st.write("---")
 
-# Initialize the GenAI Client brain securely from Streamlit Cloud Secrets with Dual-Key support
+# Initialize primary Gemini components securely
 if "Your_Gemini_API_Key" in st.secrets:
     PRIMARY_KEY = st.secrets["Your_Gemini_API_Key"]
-    BACKUP_KEY = st.secrets.get("Backup_Gemini_API_Key", PRIMARY_KEY)
 else:
     st.error("⚠️ SYSTEM BLOCK: Add 'Your_Gemini_API_Key' in Streamlit Advanced Settings -> Secrets.")
     st.stop()
 
-if "active_key" not in st.session_state:
-    st.session_state.active_key = PRIMARY_KEY
+# Safely fetch OpenRouter backup key if it exists in Secrets panel
+OPENROUTER_KEY = st.secrets.get("OpenRouter_API_Key", None)
 
-# Swapping primary model to gemini-2.0-flash to bypass server congestion forever
 PRIMARY_MODEL = "gemini-2.0-flash"
-BACKUP_MODEL = "gemini-2.5-flash"
-
 if "current_model" not in st.session_state:
     st.session_state.current_model = PRIMARY_MODEL
 
 if "cached_client" not in st.session_state:
     try:
-        st.session_state.cached_client = genai.Client(api_key=st.session_state.active_key)
+        st.session_state.cached_client = genai.Client(api_key=PRIMARY_KEY)
     except Exception as init_err:
         st.error(f"Failed to connect to Gemini API: {init_err}")
         st.stop()
@@ -158,7 +130,7 @@ LOGO_ASSET = load_and_scale_logo()
 # SYSTEM AUDIO GENERATION FUNCTION
 # =====================================================================
 def web_speak(text: str):
-    """Converts text to speech and injects an automated hidden audio player."""
+    """Convectors text to speech and injects an automated hidden audio player."""
     try:
         clean_text = text.replace("**", "").replace("*", "").replace("`", "")
         tts = gTTS(text=clean_text, lang='en', tld='com')
@@ -352,7 +324,7 @@ if "chat_session" not in st.session_state or st.session_state.last_checked_user 
     st.session_state.last_checked_user = st.session_state.active_user  
     web_speak(initial_greeting)
 
-# Global reference to your lightning logo asset configuration
+# Global reference to your thunder bolt logo asset configuration
 LOGO_URL = LOGO_ASSET
 
 # Render chat messages from history on page refresh
@@ -361,8 +333,37 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"], avatar=avatar_icon):
         st.markdown(msg["text"])
 
+
 # =====================================================================
-# 5. LIVE MOBILE WEB RUNTIME INPUT FIELD (DIRECT-EXECUTION MATRIX)
+# BACKUP FAILOVER HOOK: OPENROUTER ENDPOINT INTERFACE PIPELINE
+# =====================================================================
+def call_openrouter_backup(prompt: str, instruction: str) -> str:
+    """Connects to OpenRouter free network to fetch a response from Llama 3 if Google is down."""
+    if not OPENROUTER_KEY:
+        return "⚠️ CRITICAL ERR: Primary engine is frozen and no OpenRouter backup key is configured in settings."
+    try:
+        url = "https://openrouter.ai"
+        headers = {
+            "Authorization": f"Bearer {OPENROUTER_KEY}",
+            "Content-Type": "application/json"
+        }
+        data = {
+            "model": "meta-llama/llama-3-8b-instruct:free",
+            "messages": [
+                {"role": "system", "content": instruction},
+                {"role": "user", "content": prompt}
+            ]
+        }
+        req = urllib.request.Request(url, data=json.dumps(data).encode(), headers=headers)
+        with urllib.request.urlopen(req, timeout=8) as response:
+            res_data = json.loads(response.read().decode())
+        return res_data["choices"][0]["message"]["content"]
+    except Exception as router_err:
+        return f"❌ Mainframe Network Collapse: Google is full and OpenRouter failed: {str(router_err)}"
+
+
+# =====================================================================
+# 5. LIVE MOBILE WEB RUNTIME INPUT FIELD (WITH FULL AUTO-FAILOVER)
 # =====================================================================
 if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
     with st.chat_message("user", avatar="👤"):
@@ -374,6 +375,7 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
         
         with st.spinner("Processing network vectors..."):
             try:
+                # Step 1: Attempt normal communication through Google Gemini pipelines
                 response = st.session_state.chat_session.send_message(user_prompt)
                 agent_reply = response.text
                 
@@ -383,10 +385,18 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
 
             except Exception as e:
                 error_msg = str(e)
-                if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg or "503" in error_msg:
-                    response_placeholder.error(
-                        "⚠️ GOOGLE COOLDOWN BLOCK: Google's free servers are experiencing high load right now. "
-                        "Please pause for 45 seconds to clear the queue, then type 'Hi' to wake it up!"
-                    )
+                # Step 2: Catch if Google's servers crash or lock up with 429/503
+                is_congested = any(err in error_msg for err in ["429", "RESOURCE_EXHAUSTED", "503", "UNAVAILABLE"])
+                
+                if is_congested and OPENROUTER_KEY:
+                    response_placeholder.warning("🔄 Google Mainframe congested. Routing data vectors through OpenRouter backup...")
+                    
+                    # Execute failover call directly onto Meta Llama 3 core
+                    agent_reply = call_openrouter_backup(user_prompt, dynamic_instruction)
+                    
+                    # Clear out warning overlay and display clean response text
+                    response_placeholder.markdown(agent_reply)
+                    st.session_state.messages.append({"role": "assistant", "text": agent_reply})
+                    web_speak(agent_reply)
                 else:
                     response_placeholder.error(f"Mainframe System Alert: {error_msg}")
