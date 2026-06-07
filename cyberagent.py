@@ -335,16 +335,14 @@ for msg in st.session_state.messages:
 
 
 # =====================================================================
-# FIXED BACKUP FAILOVER HOOK: REQUESTS INDUSTRY-STANDARD MASKED PIPELINE
+# FIXED BACKUP FAILOVER HOOK: SAFELY PARSES BOTH RAW TEXT AND JSON
 # =====================================================================
 def call_openrouter_backup(prompt: str, instruction: str) -> str:
-    """Connects to OpenRouter free network using requests to pass through firewall locks securely."""
+    """Connects to OpenRouter using requests and safely reads both JSON and raw text data."""
     if not OPENROUTER_KEY:
         return "⚠️ CRITICAL ERR: Primary engine is frozen and no OpenRouter backup key is configured in settings."
     try:
         url = "https://openrouter.ai"
-        
-        # MASKED HEADERS: Forces OpenRouter to process this as a genuine browser platform request
         headers = {
             "Authorization": f"Bearer {OPENROUTER_KEY}",
             "Content-Type": "application/json",
@@ -352,7 +350,6 @@ def call_openrouter_backup(prompt: str, instruction: str) -> str:
             "X-Title": "CyberAgent Web Client Console",
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
-        
         data = {
             "model": "openchat/openchat-7b:free",
             "messages": [
@@ -361,14 +358,25 @@ def call_openrouter_backup(prompt: str, instruction: str) -> str:
             ]
         }
         
-        # Direct execution payload dispatch
+        # Dispatch transaction payload vector
         response = requests.post(url, json=data, headers=headers, timeout=10)
         
-        if response.status_code == 200:
+        # FIXED: Check if the response is empty or formatted incorrectly before parsing JSON
+        if not response.text:
+            return "⚠️ OpenRouter returned an empty connection stream. Please resend your prompt in a moment."
+            
+        try:
             res_data = response.json()
-            return res_data["choices"]["message"]["content"]
-        else:
-            return f"❌ OpenRouter Security Gate Blocked the transaction. Status Code Code: {response.status_code}. Details: {response.text}"
+            if "choices" in res_data:
+                return res_data["choices"][0]["message"]["content"]
+            elif "error" in res_data:
+                return f"⚠️ OpenRouter Engine Quota Notice: {res_data['error'].get('message')}"
+            return f"Raw System Response Matrix: {response.text[:200]}"
+        except ValueError:
+            # Fallback to display the raw text directly if the server returns a non-JSON page
+            if "Forbidden" in response.text or "Cloudflare" in response.text:
+                return "❌ Shared Server Congestion: OpenRouter has flagged the public Streamlit IP address. Please pause for 30 seconds and try again."
+            return f"Raw Connection Pipeline Broadcast: {response.text[:150]}"
             
     except Exception as router_err:
         return f"❌ Mainframe Network Collapse: Backup engine failed: {str(router_err)}"
