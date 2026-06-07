@@ -14,7 +14,7 @@ from PIL import Image
 import requests  
 
 # =====================================================================
-# 1. ULTRAMODERN TRANSPARENT MATRIX Rain INTERFACE THEME
+# 1. FIXED HOLE-PUNCHING TRANSPARENT MATRIX Rain INTERFACE THEME
 # =====================================================================
 st.set_page_config(
     page_title="CyberAgent Mainframe v9.0",
@@ -22,18 +22,22 @@ st.set_page_config(
     layout="centered"
 )
 
-# Advanced CSS Holographic Interface Injector with Transparent Overlays
+# FIXED: Forcing absolute transparency across every hidden Streamlit container layer element
 st.markdown("""
     <style>
-    /* Dark Digital Mainframe Background */
-    .stApp {
-        background-color: #06070a !important;
-        background-image: radial-gradient(circle at 50% 30%, #101524 0%, #06070a 100%) !important;
+    /* Punching a hole through every core layer wrapper block */
+    html, body, .stApp, .main, .stMainBlockContainer, 
+    div[data-testid="stAppViewContainer"], 
+    section[data-testid="stMain"], 
+    div[data-testid="stVerticalBlock"],
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: transparent !important;
+        background: transparent !important;
     }
     
-    /* FIXED: Force all block elements, lists, and pages to be transparent so the rain shines through */
-    .stMainBlockContainer, .main, div[data-testid="stVerticalBlock"] {
-        background: transparent !important;
+    /* Global baseline fallback behind the canvas */
+    body {
+        background-color: #06070a !important;
     }
     
     /* Glowing Neon Main Title */
@@ -57,7 +61,7 @@ st.markdown("""
 
     /* Premium Neon Chat Input Styling */
     div[data-testid="stChatInput"] textarea, div[data-testid="stTextInput"] input {
-        background-color: rgba(12, 15, 23, 0.9) !important;
+        background-color: rgba(12, 15, 23, 0.95) !important;
         color: #00E5FF !important;
         font-family: 'Consolas', monospace !important;
         border: 1px solid #00E5FF !important;
@@ -65,18 +69,18 @@ st.markdown("""
         border-radius: 4px !important;
     }
     
-    /* User Chat Bubble - Sleek Tactical Green Border with Transparency */
+    /* User Chat Bubble with Blended Transparency */
     div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatar"] img[alt="user"]) {
-        background-color: rgba(12, 15, 23, 0.75) !important;
+        background-color: rgba(12, 15, 23, 0.8) !important;
         border: 1px solid rgba(0, 255, 102, 0.2) !important;
         border-left: 4px solid #00FF66 !important;
         border-radius: 4px !important;
         backdrop-filter: blur(4px) !important;
     }
     
-    /* Assistant Chat Bubble - High-Tech Holographic Cyan Border with Transparency */
+    /* Assistant Chat Bubble with Blended Transparency */
     div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatar"]) {
-        background-color: rgba(8, 10, 15, 0.8) !important;
+        background-color: rgba(8, 10, 15, 0.85) !important;
         border: 1px solid rgba(0, 229, 255, 0.2) !important;
         border-left: 4px solid #00E5FF !important;
         border-radius: 4px !important;
@@ -101,9 +105,9 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# HTML5 Canvas Matrix Code Rain Background Effect Injection (Higher visibility opacity layer)
+# HTML5 Canvas Matrix Code Rain Background Effect Injection (Boosted high-contrast font colors)
 st.markdown("""
-    <canvas id="matrix" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:-1; opacity:0.35; pointer-events:none;"></canvas>
+    <canvas id="matrix" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:-1; opacity:0.4; pointer-events:none; background-color:#06070a;"></canvas>
     <script>
     const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
@@ -116,18 +120,18 @@ st.markdown("""
     const rainDrops = [];
     for (let x = 0; x < columns; x++) { rainDrops[x] = 1; }
     const draw = () => {
-        ctx.fillStyle = 'rgba(6, 7, 10, 0.05)';
+        ctx.fillStyle = 'rgba(6, 7, 10, 0.08)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#00FF66';
         ctx.font = fontSize + 'px monospace';
         for (let i = 0; i < rainDrops.length; i++) {
             const text = alphabet[Math.floor(Math.random() * alphabet.length)];
             ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
-            if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) { rainDrops[i] = 0; }
+            if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.98) { rainDrops[i] = 0; }
             rainDrops[i]++;
         }
     };
-    setInterval(draw, 30);
+    setInterval(draw, 33);
     window.addEventListener('resize', () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
