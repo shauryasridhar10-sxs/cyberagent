@@ -354,7 +354,7 @@ def call_openrouter_backup(prompt: str, instruction: str) -> str:
         }
         
         data = {
-            "model": "meta-llama/llama-3-8b-instruct:free",
+            "model": "openchat/openchat-7b:free",
             "messages": [
                 {"role": "system", "content": instruction},
                 {"role": "user", "content": prompt}
