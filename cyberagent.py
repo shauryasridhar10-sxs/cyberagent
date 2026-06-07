@@ -345,7 +345,10 @@ def call_openrouter_backup(prompt: str, instruction: str) -> str:
         url = "https://openrouter.ai"
         headers = {
             "Authorization": f"Bearer {OPENROUTER_KEY}",
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            # FIXED: Added required standard developer verification tracking headers to bypass the 403 block
+            "HTTP-Referer": "https://localhost:8501",
+            "X-Title": "CyberAgent Web Client Console"
         }
         data = {
             "model": "meta-llama/llama-3-8b-instruct:free",
@@ -357,10 +360,9 @@ def call_openrouter_backup(prompt: str, instruction: str) -> str:
         req = urllib.request.Request(url, data=json.dumps(data).encode(), headers=headers)
         with urllib.request.urlopen(req, timeout=8) as response:
             res_data = json.loads(response.read().decode())
-        return res_data["choices"][0]["message"]["content"]
+        return res_data["choices"]["message"]["content"]
     except Exception as router_err:
         return f"❌ Mainframe Network Collapse: Google is full and OpenRouter failed: {str(router_err)}"
-
 
 # =====================================================================
 # 5. LIVE MOBILE WEB RUNTIME INPUT FIELD (WITH FULL AUTO-FAILOVER)
