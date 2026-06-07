@@ -333,7 +333,6 @@ if not st.session_state.authenticated:
 # =====================================================================
 # 4. CHAT STATE & GLOBAL CONFIGURATION INITIALIZATION
 # =====================================================================
-# Injecting the live scrolling ticker overlay panel onto the mainframe active chat dashboard
 st.markdown("""
     <style>
     @keyframes scrollTech {
@@ -362,7 +361,7 @@ st.markdown("""
     </style>
     <div class="ticker-container">
         <div class="ticker-text">
-            [📡 CORE STATUS: ACTIVE] -- [🔐 QUANTUM ENCRYPTION: SECURE] -- [🧠 INTERFACE AGENT: GEMINI 2.0 MATRIX CHAT VECTOR ONLINE] -- [⚡ FIREWALL LOGS: SCANNING PROTOCOL CELL PACKETS...] -- [👑 SYSTEM CONTROL: GRANTED TO MASTER SHAURYA SRIDHAR]
+            [📡 CORE STATUS: ACTIVE] -- [🔐 QUANTUM ENCRYPTION: SECURE] -- [🧠 INTERFACE AGENT: GEMINI 2.0 MATRIX ONLINE] -- [⚡ FIREWALL LOGS: SCANNING PACKETS...] -- [👑 CONTROL: MASTER SHAURYA SRIDHAR]
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -405,32 +404,28 @@ if "chat_session" not in st.session_state or st.session_state.last_checked_user 
     st.session_state.last_checked_user = st.session_state.active_user  
     web_speak(initial_greeting)
 
-# Global reference to your thunder bolt logo asset configuration
 LOGO_URL = LOGO_ASSET
 
-# Render chat messages from history on page refresh
 for msg in st.session_state.messages:
     avatar_icon = LOGO_URL if msg["role"] == "assistant" else "👤"
     with st.chat_message(msg["role"], avatar=avatar_icon):
         st.markdown(msg["text"])
-
-
 # =====================================================================
 # FIXED BACKUP FAILOVER HOOK: DIRECT WEB ENDPOINT ROUTER
 # =====================================================================
 def call_duckduckgo_backup(prompt: str, instruction: str) -> str:
-    """Connects directly to the unblocked DuckDuckGo AI endpoint using requests to bypass all library bugs."""
+    """Connects directly to the unblocked DuckDuckGo AI endpoint."""
     try:
         url = "https://duckduckgo.com"
         headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko)",
             "Accept": "text/event-stream",
             "x-vqd-accept": "1"
         }
         init_res = requests.get("https://duckduckgo.com", headers=headers, timeout=5)
         vqd = init_res.headers.get("x-vqd-token")
         if not vqd:
-            raise ValueError("Token token generation rejected.")
+            raise ValueError("Token generation rejected.")
         headers["x-vqd-token"] = vqd
         headers["Accept"] = "application/json"
         data = {
@@ -449,7 +444,7 @@ def call_duckduckgo_backup(prompt: str, instruction: str) -> str:
                         if "message" in chunk: content += chunk["message"]
                     except: pass
             if content: return content
-        return "⚠️ Mainframe data sync packet dropped. Please try resending your prompt."
+        return "⚠️ Mainframe data sync packet dropped. Please try resending parameters."
     except Exception as ddg_err:
         try:
             url = "https://openrouter.ai"
@@ -458,11 +453,10 @@ def call_duckduckgo_backup(prompt: str, instruction: str) -> str:
             res = requests.post(url, json=data, headers=headers, timeout=5).json()
             return res["choices"]["message"]["content"]
         except:
-            return f"❌ Mainframe Network Collapse: Both Google and Backup Lanes are entirely locked: {str(ddg_err)}"
-
+            return f"❌ Mainframe Network Collapse: Both Google and Backup Lanes are locked: {str(ddg_err)}"
 
 # =====================================================================
-# 5. LIVE MOBILE WEB RUNTIME INPUT FIELD (WITH COMPLETE AUTO-FAILOVER)
+# 5. LIVE MOBILE WEB RUNTIME INPUT FIELD (PERFECTLY ALIGNED STRUCTURE)
 # =====================================================================
 if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
     with st.chat_message("user", avatar="👤"):
@@ -474,19 +468,16 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
         
         with st.spinner("Processing network vectors..."):
             try:
-                # Step 1: Attempt standard communication through Google Gemini pipelines
                 response = st.session_state.chat_session.send_message(user_prompt)
                 agent_reply = response.text
-                
                 response_placeholder.markdown(agent_reply)
                 st.session_state.messages.append({"role": "assistant", "text": agent_reply})
                 web_speak(agent_reply)
             except Exception as e:
                 error_msg = str(e)
                 is_congested = any(err in error_msg for err in ["429", "RESOURCE_EXHAUSTED", "503", "UNAVAILABLE"])
-                
                 if is_congested:
-                    response_placeholder.warning("🔄 Google Mainframe congested. Routing data vectors through unblocked backup core...")
+                    response_placeholder.warning("🔄 Google Mainframe congested. Routing data vectors through backup core...")
                     agent_reply = call_duckduckgo_backup(user_prompt, dynamic_instruction)
                     response_placeholder.markdown(agent_reply)
                     st.session_state.messages.append({"role": "assistant", "text": agent_reply})
