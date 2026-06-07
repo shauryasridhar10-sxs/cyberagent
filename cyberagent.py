@@ -340,16 +340,25 @@ for msg in st.session_state.messages:
 def call_duckduckgo_backup(prompt: str, instruction: str) -> str:
     """Connects directly to DuckDuckGo's internal unblocked pool to run Llama-3 if Google drops."""
     try:
+        # FIXED: Directly importing the dedicated chat router to bypass the attribute block error completely
+        from duckduckgo_search import DDGS
         with DDGS() as ddgs:
-            # Passes your instruction matrix seamlessly onto Meta Llama 3 on an open IP lane
             full_prompt = f"[System Context: {instruction}]\nUser Matrix Parameter: {prompt}"
-            response = ddgs.ai_chat(full_prompt, model='llama-3-70b')
+            # Accessing the correct dictionary method signature
+            response = ddgs.chat(full_prompt, model='llama-3-70b')
             if response:
                 return str(response)
             return "⚠️ Connection state returned empty. Please resend parameters."
     except Exception as ddg_err:
-        return f"❌ Mainframe Network Collapse: Both Google and Backup Lanes are entirely locked: {str(ddg_err)}"
-
+        # Ultimate fallback handler
+        try:
+            url = "https://openrouter.ai"
+            headers = {"Authorization": f"Bearer {OPENROUTER_KEY}", "Content-Type": "application/json"}
+            data = {"model": "openchat/openchat-7b:free", "messages": [{"role": "system", "content": instruction}, {"role": "user", "content": prompt}]}
+            res = requests.post(url, json=data, headers=headers, timeout=5).json()
+            return res["choices"][0]["message"]["content"]
+        except:
+            return f"❌ Mainframe Network Collapse: Both Google and Backup Lanes are entirely locked: {str(ddg_err)}"
 
 # =====================================================================
 # 5. LIVE MOBILE WEB RUNTIME INPUT FIELD (WITH COMPLETE AUTO-FAILOVER)
