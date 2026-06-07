@@ -474,12 +474,22 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
         
         with st.spinner("Processing network vectors..."):
             try:
+                # Step 1: Attempt standard communication through Google Gemini pipelines
                 response = st.session_state.chat_session.send_message(user_prompt)
                 agent_reply = response.text
+                
                 response_placeholder.markdown(agent_reply)
                 st.session_state.messages.append({"role": "assistant", "text": agent_reply})
                 web_speak(agent_reply)
             except Exception as e:
                 error_msg = str(e)
                 is_congested = any(err in error_msg for err in ["429", "RESOURCE_EXHAUSTED", "503", "UNAVAILABLE"])
+                
                 if is_congested:
+                    response_placeholder.warning("🔄 Google Mainframe congested. Routing data vectors through unblocked backup core...")
+                    agent_reply = call_duckduckgo_backup(user_prompt, dynamic_instruction)
+                    response_placeholder.markdown(agent_reply)
+                    st.session_state.messages.append({"role": "assistant", "text": agent_reply})
+                    web_speak(agent_reply)
+                else:
+                    response_placeholder.error(f"Mainframe System Alert: {error_msg}")
