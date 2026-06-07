@@ -14,7 +14,7 @@ from PIL import Image
 import requests  
 
 # =====================================================================
-# 1. NEW CYBERGRID ANIMATED INTERFACE CONFIGURATION
+# 1. PURE INDUSTRIAL CSS KEYFRAME MATRIX RAIN SYSTEM
 # =====================================================================
 st.set_page_config(
     page_title="CyberAgent Mainframe v9.0",
@@ -22,35 +22,48 @@ st.set_page_config(
     layout="centered"
 )
 
-# Advanced CSS Holographic Injector with an Embedded Animated Tech Grid
+# FIXED: Injecting pure CSS animations to build vertical raining code streams that bypass JavaScript blocks forever
 st.markdown("""
     <style>
-    /* Main App Container - Loading a lightweight, permanent looping cyberpunk matrix animation */
-    .stApp {
-        background-color: #06070a !important;
-        background-image: url('https://giphy.com') !important;
-        background-size: cover !important;
-        background-position: center !important;
-        background-attachment: fixed !important;
-    }
-    
-    /* Subtle dark overlay mask to make sure the chat text remains easily readable */
-    div[data-testid="stAppViewContainer"]::before {
-        content: "";
-        position: fixed;
-        top: 0; left: 0; width: 100vw; height: 100vh;
-        background: rgba(6, 7, 10, 0.75) !important;
-        z-index: 0;
-        pointer-events: none;
-    }
-    
-    /* Ensure chat contents sit proudly on top of the animation mask layer */
-    .stMainBlockContainer, .main, div[data-testid="stVerticalBlock"] {
-        position: relative !important;
-        z-index: 1 !important;
+    /* Main Viewport Overrides */
+    html, body, .stApp, .main, .stMainBlockContainer, 
+    div[data-testid="stAppViewContainer"], section[data-testid="stMain"] {
+        background-color: transparent !important;
         background: transparent !important;
     }
     
+    body {
+        background-color: #05070a !important;
+        overflow-x: hidden;
+    }
+
+    /* CSS Embedded Matrix Code Rain Simulator Columns */
+    .matrix-bg {
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        display: flex;
+        justify-content: space-around;
+        z-index: -1;
+        opacity: 0.15;
+        pointer-events: none;
+        font-family: 'Courier New', monospace;
+        font-size: 20px;
+        color: #00FF66;
+        overflow: hidden;
+    }
+
+    @keyframes rainFall {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(100%); }
+    }
+
+    .matrix-col {
+        animation: rainFall var(--d) linear infinite;
+        writing-mode: vertical-rl;
+        text-orientation: upright;
+        white-space: nowrap;
+    }
+
     /* Glowing Neon Main Title */
     h1 {
         color: #00FF66 !important;
@@ -106,7 +119,6 @@ st.markdown("""
         border-radius: 4px !important;
         font-family: 'Courier New', monospace !important;
         transition: all 0.3s ease !important;
-        width: 100%;
     }
     div.stButton > button:hover {
         background-color: #00FF66 !important;
@@ -116,9 +128,24 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+# Render pure CSS vertical cascading rain blocks securely without external dependencies
+st.markdown("""
+    <div class="matrix-bg">
+        <div class="matrix-col" style="--d:12s;">X018A7F9KL2P5W9</div>
+        <div class="matrix-col" style="--d:7s;">M4N8P1Q0Z3W9K2J</div>
+        <div class="matrix-col" style="--d:15s;">A7F9K2L5W9M4N8P</div>
+        <div class="matrix-col" style="--d:9s;">8P1Q0Z3W9K2J5X0</div>
+        <div class="matrix-col" style="--d:14s;">L5W9M4N8P1Q0Z3W</div>
+        <div class="matrix-col" style="--d:6s;">3W9K2J5X018A7F9</div>
+        <div class="matrix-col" style="--d:11s;">M4N8P1Q0Z3W9K2J</div>
+        <div class="matrix-col" style="--d:8s;">K2J5X018A7F9K2L</div>
+        <div class="matrix-col" style="--d:13s;">7F9K2L5W9M4N8P1</div>
+        <div class="matrix-col" style="--d:10s;">Q0Z3W9K2J5X018A</div>
+    </div>
+    """, unsafe_allow_html=True)
+
 st.title("⚡ CYBERAGENT CORE v9.0 ⚡")
 st.write("---")
-
 # Initialize primary Gemini components securely
 if "Your_Gemini_API_Key" in st.secrets:
     PRIMARY_KEY = st.secrets["Your_Gemini_API_Key"]
