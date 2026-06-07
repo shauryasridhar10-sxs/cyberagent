@@ -24,6 +24,7 @@ st.set_page_config(
 # Advanced CSS Holographic Interface Injector
 st.markdown("""
     <style>
+    /* Dark Digital Mainframe Background with Subtle Tech Grid Overlay */
     .stApp {
         background-color: #06070a !important;
         background-image: 
@@ -32,6 +33,8 @@ st.markdown("""
             radial-gradient(circle at 50% 30%, #101524 0%, #06070a 100%) !important;
         background-size: 30px 30px, 30px 30px, auto !important;
     }
+    
+    /* Glowing Neon Main Title */
     h1 {
         color: #00FF66 !important;
         font-family: 'Courier New', monospace !important;
@@ -41,12 +44,16 @@ st.markdown("""
         letter-spacing: 4px;
         text-transform: uppercase;
     }
+    
+    /* Holographic Cyan Subheadings */
     h3, .stSubheader {
         color: #00E5FF !important;
         font-family: 'Consolas', monospace !important;
         text-shadow: 0 0 10px rgba(0, 229, 255, 0.5) !important;
         letter-spacing: 1px;
     }
+
+    /* Premium Neon Chat Input Styling */
     div[data-testid="stChatInput"] textarea, div[data-testid="stTextInput"] input {
         background-color: #0c0f17 !important;
         color: #00E5FF !important;
@@ -54,25 +61,41 @@ st.markdown("""
         border: 1px solid #00E5FF !important;
         box-shadow: 0 0 15px rgba(0, 229, 255, 0.15) !important;
         border-radius: 4px !important;
+        transition: all 0.3s ease;
     }
+    div[data-testid="stChatInput"] textarea:focus, div[data-testid="stTextInput"] input:focus {
+        border: 1px solid #00FF66 !important;
+        box-shadow: 0 0 20px rgba(0, 255, 102, 0.3) !important;
+    }
+    
+    /* User Chat Bubble - Sleek Tactical Green Border */
     div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatar"] img[alt="user"]) {
         background-color: rgba(12, 15, 23, 0.85) !important;
         border: 1px solid rgba(0, 255, 102, 0.2) !important;
         border-left: 4px solid #00FF66 !important;
         border-radius: 4px !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
     }
+    
+    /* Assistant Chat Bubble - High-Tech Holographic Cyan Border */
     div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatar"]) {
         background-color: rgba(8, 10, 15, 0.9) !important;
         border: 1px solid rgba(0, 229, 255, 0.2) !important;
         border-left: 4px solid #00E5FF !important;
         border-radius: 4px !important;
+        box-shadow: 0 4px 15px rgba(0, 229, 255, 0.05) !important;
     }
+
+    /* Interactive Command Terminal Buttons */
     div.stButton > button {
         background-color: rgba(0, 255, 102, 0.05) !important;
         color: #00FF66 !important;
         border: 1px solid #00FF66 !important;
         border-radius: 4px !important;
         font-family: 'Courier New', monospace !important;
+        font-weight: bold !important;
+        letter-spacing: 1px;
+        box-shadow: 0 0 10px rgba(0, 255, 102, 0.1) !important;
         transition: all 0.3s ease !important;
         width: 100%;
     }
@@ -80,6 +103,7 @@ st.markdown("""
         background-color: #00FF66 !important;
         color: #06070a !important;
         box-shadow: 0 0 20px rgba(0, 255, 102, 0.7) !important;
+        transform: translateY(-1px);
     }
     </style>
     """, unsafe_allow_html=True)
@@ -87,7 +111,7 @@ st.markdown("""
 st.title("⚡ CYBERAGENT CORE v8.0 ⚡")
 st.write("---")
 
-# Secure multi-key extraction block
+# Initialize the GenAI Client brain securely from Streamlit Cloud Secrets with Dual-Key support
 if "Your_Gemini_API_Key" in st.secrets:
     PRIMARY_KEY = st.secrets["Your_Gemini_API_Key"]
     BACKUP_KEY = st.secrets.get("Backup_Gemini_API_Key", PRIMARY_KEY)
@@ -95,16 +119,16 @@ else:
     st.error("⚠️ SYSTEM BLOCK: Add 'Your_Gemini_API_Key' in Streamlit Advanced Settings -> Secrets.")
     st.stop()
 
-PRIMARY_MODEL = "gemini-2.5-flash"
-BACKUP_MODEL = "gemini-2.0-flash"
-
-# Initialize single-instance memory keys
 if "active_key" not in st.session_state:
     st.session_state.active_key = PRIMARY_KEY
+
+# Swapping primary model to gemini-2.0-flash to bypass server congestion forever
+PRIMARY_MODEL = "gemini-2.0-flash"
+BACKUP_MODEL = "gemini-2.5-flash"
+
 if "current_model" not in st.session_state:
     st.session_state.current_model = PRIMARY_MODEL
 
-# FIXED: Store client in state memory to kill continuous connection re-creation errors forever
 if "cached_client" not in st.session_state:
     try:
         st.session_state.cached_client = genai.Client(api_key=st.session_state.active_key)
@@ -223,6 +247,7 @@ def get_live_weather(city_name: str) -> str:
         return f"Meteorological metrics failure: {str(e)}"
 
 
+# Unified tool packaging configuration array
 agent_tools = [get_current_time, python_calculator, google_search_tool, get_live_weather]
 # =====================================================================
 # 3. INTERACTIVE WEB AUTHENTICATION (WITH ANIMATED CYBERPUNK BANNER)
@@ -317,7 +342,6 @@ agent_config = types.GenerateContentConfig(
     temperature=0.3
 )
 
-# Initialize the chat session object securely onto the single-instance cached client
 if "chat_session" not in st.session_state or st.session_state.last_checked_user != st.session_state.active_user:
     st.session_state.chat_session = st.session_state.cached_client.chats.create(
         model=st.session_state.current_model, 
@@ -328,9 +352,12 @@ if "chat_session" not in st.session_state or st.session_state.last_checked_user 
     st.session_state.last_checked_user = st.session_state.active_user  
     web_speak(initial_greeting)
 
+# Global reference to your lightning logo asset configuration
+LOGO_URL = LOGO_ASSET
+
 # Render chat messages from history on page refresh
 for msg in st.session_state.messages:
-    avatar_icon = LOGO_ASSET if msg["role"] == "assistant" else "👤"
+    avatar_icon = LOGO_URL if msg["role"] == "assistant" else "👤"
     with st.chat_message(msg["role"], avatar=avatar_icon):
         st.markdown(msg["text"])
 
@@ -342,29 +369,24 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
         st.markdown(user_prompt)
     st.session_state.messages.append({"role": "user", "text": user_prompt})
 
-    with st.chat_message("assistant", avatar=LOGO_ASSET):
+    with st.chat_message("assistant", avatar=LOGO_URL):
         response_placeholder = st.empty()
         
         with st.spinner("Processing network vectors..."):
             try:
-                # Direct single-call execution stream. No loops to trigger automated blocks.
                 response = st.session_state.chat_session.send_message(user_prompt)
                 agent_reply = response.text
                 
-                # Output final response cleanly to the layout screen
                 response_placeholder.markdown(agent_reply)
                 st.session_state.messages.append({"role": "assistant", "text": agent_reply})
-                
-                # Triggers automated web audio playback natively!
                 web_speak(agent_reply)
 
             except Exception as e:
-                # Catch the exact raw server traceback error so we see exactly what is happening
                 error_msg = str(e)
-                if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
+                if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg or "503" in error_msg:
                     response_placeholder.error(
-                        "⚠️ GOOGLE COOLDOWN BLOCK: Google's free servers are heavily overloaded globally right now. "
-                        "Please pause for exactly 60 seconds to clear the server queue, then type 'Hi' to wake it up!"
+                        "⚠️ GOOGLE COOLDOWN BLOCK: Google's free servers are experiencing high load right now. "
+                        "Please pause for 45 seconds to clear the queue, then type 'Hi' to wake it up!"
                     )
                 else:
                     response_placeholder.error(f"Mainframe System Alert: {error_msg}")
