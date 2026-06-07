@@ -298,6 +298,10 @@ if not st.session_state.authenticated:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
+# Tracker to verify if the active profile name changed mid-session
+if "last_checked_user" not in st.session_state:
+    st.session_state.last_checked_user = st.session_state.active_user
+
 if st.session_state.is_creator:
     dynamic_instruction = (
         "You are CyberAgent, speaking directly to your master developer, creator, and boss, SHAURYA SRIDHAR. "
@@ -322,17 +326,20 @@ agent_config = types.GenerateContentConfig(
     temperature=0.3
 )
 
-if "chat_session" not in st.session_state:
-    st.session_state.chat_session = client.chats.create(model="gemini-2.5-flash", config=agent_config)
-
-# Inject the first proactive greeting statement if the chat history memory is empty
-if len(st.session_state.messages) == 0:
+# FIXED: If a different name logs in, force-delete the old memory trace completely
+if "chat_session" not in st.session_state or st.session_state.last_checked_user != st.session_state.active_user:
+    st.session_state.chat_session = client.chats.create(model=st.session_state.current_model, config=agent_config)
+    st.session_state.messages = []  # Wipes historical crosstalk bubbles clean
     st.session_state.messages.append({"role": "assistant", "text": initial_greeting})
+    st.session_state.last_checked_user = st.session_state.active_user  # Sync tracking pointer
     web_speak(initial_greeting)
 
-# Render chat messages from history with optimized local avatar objects
+# Global reference to your thunder bolt logo asset configuration
+LOGO_URL = "⚡"
+
+# Render chat messages from history on page refresh
 for msg in st.session_state.messages:
-    avatar_icon = LOGO_ASSET if msg["role"] == "assistant" else "👤"
+    avatar_icon = LOGO_URL if msg["role"] == "assistant" else "👤"
     with st.chat_message(msg["role"], avatar=avatar_icon):
         st.markdown(msg["text"])
 
