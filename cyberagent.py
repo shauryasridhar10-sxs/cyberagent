@@ -343,7 +343,7 @@ def call_duckduckgo_backup(prompt: str, instruction: str) -> str:
         with DDGS() as ddgs:
             # Passes your instruction matrix seamlessly onto Meta Llama 3 on an open IP lane
             full_prompt = f"[System Context: {instruction}]\nUser Matrix Parameter: {prompt}"
-            response = ddgs.chat(full_prompt, model='llama-3-70b')
+            response = ddgs.ai_chat(full_prompt, model='llama-3-70b')
             if response:
                 return str(response)
             return "⚠️ Connection state returned empty. Please resend parameters."
