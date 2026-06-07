@@ -14,7 +14,7 @@ from PIL import Image
 import requests  
 
 # =====================================================================
-# 1. ULTRAMODERN CYBERNETIC GRID & MATRIX ANIMATION THEME
+# 1. ULTRAMODERN TRANSPARENT MATRIX Rain INTERFACE THEME
 # =====================================================================
 st.set_page_config(
     page_title="CyberAgent Mainframe v9.0",
@@ -22,13 +22,18 @@ st.set_page_config(
     layout="centered"
 )
 
-# Advanced CSS Holographic Interface & Matrix Rain Canvas Injector
+# Advanced CSS Holographic Interface Injector with Transparent Overlays
 st.markdown("""
     <style>
     /* Dark Digital Mainframe Background */
     .stApp {
         background-color: #06070a !important;
         background-image: radial-gradient(circle at 50% 30%, #101524 0%, #06070a 100%) !important;
+    }
+    
+    /* FIXED: Force all block elements, lists, and pages to be transparent so the rain shines through */
+    .stMainBlockContainer, .main, div[data-testid="stVerticalBlock"] {
+        background: transparent !important;
     }
     
     /* Glowing Neon Main Title */
@@ -52,33 +57,30 @@ st.markdown("""
 
     /* Premium Neon Chat Input Styling */
     div[data-testid="stChatInput"] textarea, div[data-testid="stTextInput"] input {
-        background-color: #0c0f17 !important;
+        background-color: rgba(12, 15, 23, 0.9) !important;
         color: #00E5FF !important;
         font-family: 'Consolas', monospace !important;
         border: 1px solid #00E5FF !important;
         box-shadow: 0 0 15px rgba(0, 229, 255, 0.15) !important;
         border-radius: 4px !important;
-        transition: all 0.3s ease;
-    }
-    div[data-testid="stChatInput"] textarea:focus, div[data-testid="stTextInput"] input:focus {
-        border: 1px solid #00FF66 !important;
-        box-shadow: 0 0 20px rgba(0, 255, 102, 0.3) !important;
     }
     
-    /* User Chat Bubble - Sleek Tactical Green Border */
+    /* User Chat Bubble - Sleek Tactical Green Border with Transparency */
     div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatar"] img[alt="user"]) {
-        background-color: rgba(12, 15, 23, 0.85) !important;
+        background-color: rgba(12, 15, 23, 0.75) !important;
         border: 1px solid rgba(0, 255, 102, 0.2) !important;
         border-left: 4px solid #00FF66 !important;
         border-radius: 4px !important;
+        backdrop-filter: blur(4px) !important;
     }
     
-    /* Assistant Chat Bubble - High-Tech Holographic Cyan Border */
+    /* Assistant Chat Bubble - High-Tech Holographic Cyan Border with Transparency */
     div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatar"]) {
-        background-color: rgba(8, 10, 15, 0.9) !important;
+        background-color: rgba(8, 10, 15, 0.8) !important;
         border: 1px solid rgba(0, 229, 255, 0.2) !important;
         border-left: 4px solid #00E5FF !important;
         border-radius: 4px !important;
+        backdrop-filter: blur(4px) !important;
     }
 
     /* Interactive Command Terminal Buttons */
@@ -88,7 +90,6 @@ st.markdown("""
         border: 1px solid #00FF66 !important;
         border-radius: 4px !important;
         font-family: 'Courier New', monospace !important;
-        font-weight: bold !important;
         transition: all 0.3s ease !important;
         width: 100%;
     }
@@ -100,15 +101,15 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# HTML5 Canvas Matrix Code Rain Background Effect Injection
+# HTML5 Canvas Matrix Code Rain Background Effect Injection (Higher visibility opacity layer)
 st.markdown("""
-    <canvas id="matrix" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:-1; opacity:0.15; pointer-events:none;"></canvas>
+    <canvas id="matrix" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:-1; opacity:0.35; pointer-events:none;"></canvas>
     <script>
     const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    const ltrs = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZアイウエオカキクケコサシスセソタチツテト';
+    const ltrs = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const alphabet = ltrs.split('');
     const fontSize = 16;
     const columns = canvas.width / fontSize;
