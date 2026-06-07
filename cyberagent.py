@@ -14,7 +14,7 @@ from PIL import Image
 import requests  
 
 # =====================================================================
-# 1. FIXED HOLE-PUNCHING TRANSPARENT MATRIX Rain INTERFACE THEME
+# 1. NEW CYBERGRID ANIMATED INTERFACE CONFIGURATION
 # =====================================================================
 st.set_page_config(
     page_title="CyberAgent Mainframe v9.0",
@@ -22,22 +22,33 @@ st.set_page_config(
     layout="centered"
 )
 
-# FIXED: Forcing absolute transparency across every hidden Streamlit container layer element
+# Advanced CSS Holographic Injector with an Embedded Animated Tech Grid
 st.markdown("""
     <style>
-    /* Punching a hole through every core layer wrapper block */
-    html, body, .stApp, .main, .stMainBlockContainer, 
-    div[data-testid="stAppViewContainer"], 
-    section[data-testid="stMain"], 
-    div[data-testid="stVerticalBlock"],
-    div[data-testid="stVerticalBlockBorderWrapper"] {
-        background-color: transparent !important;
-        background: transparent !important;
+    /* Main App Container - Loading a lightweight, permanent looping cyberpunk matrix animation */
+    .stApp {
+        background-color: #06070a !important;
+        background-image: url('https://giphy.com') !important;
+        background-size: cover !important;
+        background-position: center !important;
+        background-attachment: fixed !important;
     }
     
-    /* Global baseline fallback behind the canvas */
-    body {
-        background-color: #06070a !important;
+    /* Subtle dark overlay mask to make sure the chat text remains easily readable */
+    div[data-testid="stAppViewContainer"]::before {
+        content: "";
+        position: fixed;
+        top: 0; left: 0; width: 100vw; height: 100vh;
+        background: rgba(6, 7, 10, 0.75) !important;
+        z-index: 0;
+        pointer-events: none;
+    }
+    
+    /* Ensure chat contents sit proudly on top of the animation mask layer */
+    .stMainBlockContainer, .main, div[data-testid="stVerticalBlock"] {
+        position: relative !important;
+        z-index: 1 !important;
+        background: transparent !important;
     }
     
     /* Glowing Neon Main Title */
@@ -105,42 +116,9 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# HTML5 Canvas Matrix Code Rain Background Effect Injection (Boosted high-contrast font colors)
-st.markdown("""
-    <canvas id="matrix" style="position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:-1; opacity:0.4; pointer-events:none; background-color:#06070a;"></canvas>
-    <script>
-    const canvas = document.getElementById('matrix');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    const ltrs = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const alphabet = ltrs.split('');
-    const fontSize = 16;
-    const columns = canvas.width / fontSize;
-    const rainDrops = [];
-    for (let x = 0; x < columns; x++) { rainDrops[x] = 1; }
-    const draw = () => {
-        ctx.fillStyle = 'rgba(6, 7, 10, 0.08)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = '#00FF66';
-        ctx.font = fontSize + 'px monospace';
-        for (let i = 0; i < rainDrops.length; i++) {
-            const text = alphabet[Math.floor(Math.random() * alphabet.length)];
-            ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
-            if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.98) { rainDrops[i] = 0; }
-            rainDrops[i]++;
-        }
-    };
-    setInterval(draw, 33);
-    window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    });
-    </script>
-    """, unsafe_allow_html=True)
-
 st.title("⚡ CYBERAGENT CORE v9.0 ⚡")
 st.write("---")
+
 # Initialize primary Gemini components securely
 if "Your_Gemini_API_Key" in st.secrets:
     PRIMARY_KEY = st.secrets["Your_Gemini_API_Key"]
