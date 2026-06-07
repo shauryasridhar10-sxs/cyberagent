@@ -335,7 +335,7 @@ for msg in st.session_state.messages:
         st.markdown(msg["text"])
 
 # =====================================================================
-# 5. LIVE MOBILE WEB RUNTIME INPUT FIELD (OPTIMIZED SINGLE-PIPE RUNTIME)
+# 5. LIVE MOBILE WEB RUNTIME INPUT FIELD (DIRECT-EXECUTION MATRIX)
 # =====================================================================
 if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
     with st.chat_message("user", avatar="👤"):
@@ -345,48 +345,26 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
     with st.chat_message("assistant", avatar=LOGO_ASSET):
         response_placeholder = st.empty()
         
-        max_retries = 3
-        retry_delay = 3
-        success = False
-        agent_reply = ""
-
         with st.spinner("Processing network vectors..."):
-            for attempt in range(max_retries):
-                try:
-                    # FIXED: Send the message through the permanent cached client connection instance stream
-                    response = st.session_state.chat_session.send_message(user_prompt)
-                    agent_reply = response.text
-                    success = True
-                    break
-
-                except Exception as e:
-                    is_retryable = any(err in str(e) for err in ["503", "429", "UNAVAILABLE", "RESOURCE_EXHAUSTED"])
-                    
-                    if is_retryable:
-                        if st.session_state.active_key == PRIMARY_KEY and BACKUP_KEY != PRIMARY_KEY:
-                            st.session_state.active_key = BACKUP_KEY
-                            # Hot-swap client parameters permanently in state memory cache
-                            st.session_state.cached_client = genai.Client(api_key=st.session_state.active_key)
-                            response_placeholder.warning("🔄 Traffic Congestion on Key #1. Shifting pipeline lanes to Backup Key #2...")
-                        else:
-                            st.session_state.current_model = BACKUP_MODEL
-                            response_placeholder.warning("🔄 Quota congestion detected. Swapping model vectors to backup engine...")
-                        
-                        # Re-bind session tracking mapping cleanly
-                        extracted_history = st.session_state.chat_session.get_history()
-                        st.session_state.chat_session = st.session_state.cached_client.chats.create(
-                            model=st.session_state.current_model, 
-                            config=agent_config, 
-                            history=extracted_history
-                        )
-                        time.sleep(retry_delay)
-                    else:
-                        response_placeholder.error(f"Execution Error: {e}")
-                        break
-
-            if success and agent_reply:
+            try:
+                # Direct single-call execution stream. No loops to trigger automated blocks.
+                response = st.session_state.chat_session.send_message(user_prompt)
+                agent_reply = response.text
+                
+                # Output final response cleanly to the layout screen
                 response_placeholder.markdown(agent_reply)
                 st.session_state.messages.append({"role": "assistant", "text": agent_reply})
+                
+                # Triggers automated web audio playback natively!
                 web_speak(agent_reply)
-            elif not success:
-                response_placeholder.error("❌ Both API traffic lanes are heavily congested. Please wait a moment and tap transmit to retry.")
+
+            except Exception as e:
+                # Catch the exact raw server traceback error so we see exactly what is happening
+                error_msg = str(e)
+                if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
+                    response_placeholder.error(
+                        "⚠️ GOOGLE COOLDOWN BLOCK: Google's free servers are heavily overloaded globally right now. "
+                        "Please pause for exactly 60 seconds to clear the server queue, then type 'Hi' to wake it up!"
+                    )
+                else:
+                    response_placeholder.error(f"Mainframe System Alert: {error_msg}")
