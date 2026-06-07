@@ -298,27 +298,24 @@ if not st.session_state.authenticated:
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Tracker to verify if the active profile name changed mid-session
 if "last_checked_user" not in st.session_state:
     st.session_state.last_checked_user = st.session_state.active_user
 
 if st.session_state.is_creator:
     dynamic_instruction = (
-        "You are CyberAgent, speaking directly to your master developer, creator, and boss, SHAURYA SRIDHAR. "
-        "Address him with utmost respect. You are completely loyal to him. "
-        "You have the get_live_weather tool to look up live, precise weather parameters for him. "
-        "IMPORTANT: Do not spam or repeat his name in every single sentence. Speak naturally. "
-        "Keep responses very short and brief so they are pleasant to hear."
+        "You are CyberAgent, a highly advanced intelligence speaking directly to your master developer and boss. "
+        "Address him with utmost respect as 'Boss' or 'Sir'. "
+        "CRITICAL: Do NOT type or say the name 'SHAURYA SRIDHAR' or 'SHAURYA' in your replies. "
+        "Speak naturally, professionally, and keep your responses extremely short, crisp, and brief."
     )
-    initial_greeting = f"System vectors initialized successfully. Greetings, Master SHAURYA SRIDHAR. CyberAgent console online and fully loyal. How may I assist your development matrix today?"
+    initial_greeting = "System vectors initialized successfully. Greetings, Boss. CyberAgent console online and fully loyal. How may I assist your development matrix today?"
 else:
     dynamic_instruction = (
         f"You are CyberAgent, speaking to a guest user named {st.session_state.active_user}. "
         "Be polite, helpful, and professional. Always proudly state that your sole creator "
-        "and mastermind developer is SHAURYA SRIDHAR. You have the get_live_weather tool to check weather data. "
-        "Keep responses short and brief so they read out loud nicely."
+        "and mastermind developer is Shaurya Sridhar, but keep your responses short, crisp, and brief."
     )
-    initial_greeting = f"Welcome authorized system user, {st.session_state.active_user}. Core engines operational. I am CyberAgent, and my mastermind creator is SHAURYA SRIDHAR. Standing by for parameters..."
+    initial_greeting = f"Welcome authorized system user, {st.session_state.active_user}. Core engines operational. I am CyberAgent, and my mastermind creator is Shaurya Sridhar. Standing by for parameters..."
 
 agent_config = types.GenerateContentConfig(
     system_instruction=dynamic_instruction,
@@ -326,12 +323,11 @@ agent_config = types.GenerateContentConfig(
     temperature=0.3
 )
 
-# FIXED: If a different name logs in, force-delete the old memory trace completely
 if "chat_session" not in st.session_state or st.session_state.last_checked_user != st.session_state.active_user:
-    st.session_state.chat_session = client.chats.create(model=st.session_state.current_model, config=agent_config)
-    st.session_state.messages = []  # Wipes historical crosstalk bubbles clean
+    st.session_state.chat_session = client.chats.create(model="gemini-2.5-flash", config=agent_config)
+    st.session_state.messages = []  
     st.session_state.messages.append({"role": "assistant", "text": initial_greeting})
-    st.session_state.last_checked_user = st.session_state.active_user  # Sync tracking pointer
+    st.session_state.last_checked_user = st.session_state.active_user  
     web_speak(initial_greeting)
 
 # Global reference to your thunder bolt logo asset configuration
