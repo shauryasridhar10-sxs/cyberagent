@@ -10,84 +10,105 @@ from google.genai import types
 from ddgs import DDGS
 import streamlit as st
 from gtts import gTTS
-from PIL import Image  # Added for ultra-smooth image scaling protection
+from PIL import Image  
 
 # =====================================================================
-# 1. NEW CYBERPUNK VISUAL CSS THEME CONFIGURATION
+# 1. ULTRAMODERN CYBERNETIC GRID THEME CONFIGURATION
 # =====================================================================
 st.set_page_config(
-    page_title="CyberAgent Web Console v7.5",
+    page_title="CyberAgent Mainframe v8.0",
     page_icon="⚡",
     layout="centered"
 )
 
-# Advanced CSS Glow Theme Injector
+# Advanced CSS Holographic Interface Injector
 st.markdown("""
     <style>
-    /* Main Background Deep Matrix */
+    /* Dark Digital Mainframe Background with Subtle Tech Grid Overlay */
     .stApp {
-        background-color: #0d0e12 !important;
-        background-image: radial-gradient(circle at 50% 50%, #161922 0%, #0d0e12 100%) !important;
+        background-color: #06070a !important;
+        background-image: 
+            linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+            radial-gradient(circle at 50% 30%, #101524 0%, #06070a 100%) !important;
+        background-size: 30px 30px, 30px 30px, auto !important;
     }
     
-    /* Main Headings and Titles */
+    /* Glowing Neon Main Title */
     h1 {
         color: #00FF66 !important;
         font-family: 'Courier New', monospace !important;
-        text-shadow: 0 0 10px rgba(0, 255, 102, 0.6), 0 0 20px rgba(0, 255, 102, 0.3) !important;
+        font-weight: 900 !important;
+        text-shadow: 0 0 10px rgba(0, 255, 102, 0.8), 0 0 30px rgba(0, 255, 102, 0.4) !important;
         text-align: center;
-        letter-spacing: 2px;
+        letter-spacing: 4px;
+        text-transform: uppercase;
     }
     
-    /* Subheadings */
+    /* Holographic Cyan Subheadings */
     h3, .stSubheader {
         color: #00E5FF !important;
         font-family: 'Consolas', monospace !important;
-        text-shadow: 0 0 8px rgba(0, 229, 255, 0.4) !important;
+        text-shadow: 0 0 10px rgba(0, 229, 255, 0.5) !important;
+        letter-spacing: 1px;
     }
 
-    /* Premium Neon Chat Input Styling */
-    div[data-testid="stChatInput"] textarea {
-        background-color: #161922 !important;
-        color: #ffffff !important;
+    /* Premium Futuristic Input Fields & Textareas */
+    div[data-testid="stChatInput"] textarea, div[data-testid="stTextInput"] input {
+        background-color: #0c0f17 !important;
+        color: #00E5FF !important;
+        font-family: 'Consolas', monospace !important;
         border: 1px solid #00E5FF !important;
-        box-shadow: 0 0 10px rgba(0, 229, 255, 0.2) !important;
-        border-radius: 8px !important;
+        box-shadow: 0 0 15px rgba(0, 229, 255, 0.15) !important;
+        border-radius: 4px !important;
+        transition: all 0.3s ease;
+    }
+    div[data-testid="stChatInput"] textarea:focus, div[data-testid="stTextInput"] input:focus {
+        border: 1px solid #00FF66 !important;
+        box-shadow: 0 0 20px rgba(0, 255, 102, 0.3) !important;
     }
     
-    /* Custom Stylings for User vs Assistant Chat Boxes */
+    /* User Chat Bubble - Sleek Tactical Green Border */
     div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatar"] img[alt="user"]) {
-        background-color: rgba(22, 25, 34, 0.8) !important;
-        border-left: 3px solid #00FF66 !important;
-        border-radius: 10px !important;
+        background-color: rgba(12, 15, 23, 0.85) !important;
+        border: 1px solid rgba(0, 255, 102, 0.2) !important;
+        border-left: 4px solid #00FF66 !important;
+        border-radius: 4px !important;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
     }
-    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatar"] img[alt="assistant"]) {
-        background-color: rgba(13, 14, 18, 0.9) !important;
-        border-left: 3px solid #00E5FF !important;
-        border-radius: 10px !important;
-        box-shadow: 0 0 15px rgba(0, 229, 255, 0.05) !important;
+    
+    /* Assistant Chat Bubble - High-Tech Holographic Cyan Border */
+    div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatar"]) {
+        background-color: rgba(8, 10, 15, 0.9) !important;
+        border: 1px solid rgba(0, 229, 255, 0.2) !important;
+        border-left: 4px solid #00E5FF !important;
+        border-radius: 4px !important;
+        box-shadow: 0 4px 15px rgba(0, 229, 255, 0.05) !important;
     }
 
-    /* Standard Interactive Form Click Buttons */
+    /* Interactive Command Terminal Buttons */
     div.stButton > button {
-        background-color: transparent !important;
+        background-color: rgba(0, 255, 102, 0.05) !important;
         color: #00FF66 !important;
-        border: 2px solid #00FF66 !important;
-        border-radius: 6px !important;
+        border: 1px solid #00FF66 !important;
+        border-radius: 4px !important;
         font-family: 'Courier New', monospace !important;
         font-weight: bold !important;
-        box-shadow: 0 0 8px rgba(0, 255, 102, 0.2) !important;
+        letter-spacing: 1px;
+        box-shadow: 0 0 10px rgba(0, 255, 102, 0.1) !important;
         transition: all 0.3s ease !important;
+        width: 100%;
     }
     div.stButton > button:hover {
         background-color: #00FF66 !important;
-        color: #0d0e12 !important;
-        box-shadow: 0 0 15px rgba(0, 255, 102, 0.6) !important;
+        color: #06070a !important;
+        box-shadow: 0 0 20px rgba(0, 255, 102, 0.7) !important;
+        transform: translateY(-1px);
     }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("⚡ CYBERAGENT CORE v7.5 ⚡")
+st.title("⚡ CYBERAGENT CORE v8.0 ⚡")
 st.write("---")
 
 # Initialize the GenAI Client brain securely from Streamlit Cloud Secrets with Dual-Key support
@@ -112,9 +133,8 @@ BACKUP_MODEL = "gemini-2.0-flash"
 
 if "current_model" not in st.session_state:
     st.session_state.current_model = PRIMARY_MODEL
-
 # =====================================================================
-# FIXED: AUTOMATED LOGO DOWNLOAD & IMAGE OPTIMIZATION PIPELINE
+# AUTOMATED LOGO DOWNLOAD & IMAGE OPTIMIZATION PIPELINE
 # =====================================================================
 @st.cache_data(show_spinner=False)
 def load_and_scale_logo() -> Image.Image:
@@ -124,12 +144,10 @@ def load_and_scale_logo() -> Image.Image:
         req = urllib.request.Request(raw_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as response:
             img_data = response.read()
-        # Compress and scale image down perfectly for a chat profile bubble icon
         img = Image.open(io.BytesIO(img_data))
         img.thumbnail((128, 128))
         return img
     except Exception:
-        # Emergency backup icon if GitHub connection drops
         return "⚡"
 
 # Initialize scaled layout asset globally
@@ -253,19 +271,20 @@ if not st.session_state.authenticated:
             font-size: 14px;
             font-weight: bold;
             text-align: center;
-            background-color: #161922;
+            background-color: #0c0f17;
             padding: 15px;
-            border-radius: 6px;
-            border: 1px dashed #00FF66;
+            border-radius: 4px;
+            border: 1px dashed #00E5FF;
             margin-bottom: 25px;
             animation: cyberPulse 2s infinite;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.1);
         }
         </style>
         <div class="cyber-banner">
-            🚀 SYSTEM INITIALIZATION IN PROGRESS...<br>
-            [📡 CONNECTING TO CORE DATAFRAME VECTORS...]<br>
-            [🔐 ENCRYPTING SHAURYA'S PRIVATE FIREWALL...]<br>
-            [🧠 MATRIX STANDING BY FOR AUTHORIZATION]
+            🚀 MAINFRAME DATA TUNNEL ESTABLISHED...<br>
+            [📡 SCROLLING METRIC CELL INTERFACES...]<br>
+            [🔐 INJECTING QUANTUM FIREWALL ENVELOPE...]<br>
+            [🧠 SYSTEM ONLINE: AWAITING CREDENTIAL SCAN]
         </div>
         """, unsafe_allow_html=True)
 
@@ -279,7 +298,7 @@ if not st.session_state.authenticated:
             if visitor_name.upper() in ["SHAURYA SRIDHAR", "SHAURYA", "ADMIN"]:
                 st.session_state.is_creator = True
                 st.session_state.active_user = "SHAURYA SRIDHAR"
-                st.success("ACCESS GRANTED. Welcome back, Master Developer Shaurya Sridhar.")
+                st.success("ACCESS GRANTED. Welcome back, Master Developer.")
             else:
                 st.session_state.is_creator = False
                 st.session_state.active_user = visitor_name if visitor_name else "Guest User"
@@ -347,8 +366,7 @@ if user_prompt := st.chat_input("Transmit parameters to CyberAgent..."):
         st.markdown(user_prompt)
     st.session_state.messages.append({"role": "user", "text": user_prompt})
 
-    # Display response bound directly to your pixel-optimized logo asset
-    with st.chat_message("assistant", avatar=LOGO_ASSET):
+    with st.chat_message("assistant", avatar=LOGO_URL):
         response_placeholder = st.empty()
         
         max_retries = 3
