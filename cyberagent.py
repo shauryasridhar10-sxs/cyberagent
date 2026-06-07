@@ -335,20 +335,58 @@ for msg in st.session_state.messages:
 
 
 # =====================================================================
-# FIXED UNBROKEN BACKUP FAILOVER HOOK: DUCKDUCKGO ZERO-KEY AI ENGINE
+# FIXED UNBROKEN BACKUP FAILOVER HOOK: DIRECT WEB ENDPOINT ROUTER
 # =====================================================================
 def call_duckduckgo_backup(prompt: str, instruction: str) -> str:
-    """Connects directly to DuckDuckGo's internal unblocked pool to run Llama-3 if Google drops."""
+    """Connects directly to the unblocked DuckDuckGo AI endpoint using requests to bypass all library bugs."""
     try:
-        # FIXED: Removed the local import line so it uses your top-level DDGS package safely
-        with DDGS() as ddgs:
-            full_prompt = f"[System Context: {instruction}]\nUser Matrix Parameter: {prompt}"
-            response = ddgs.chat(full_prompt, model='llama-3-70b')
-            if response:
-                return str(response)
-            return "⚠️ Connection state returned empty. Please resend parameters."
+        url = "https://duckduckgo.com"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/event-stream",
+            "x-vqd-accept": "1"
+        }
+        
+        # Step 1: Request an official tracking transaction token from the gateway
+        init_res = requests.get("https://duckduckgo.com", headers=headers, timeout=5)
+        vqd = init_res.headers.get("x-vqd-token")
+        
+        if not vqd:
+            # Fallback directly to OpenRouter layer if token initialization drops
+            raise ValueError("Token token generation rejected.")
+            
+        # Step 2: Dispatch payload matrix securely to Meta Llama-3 core
+        headers["x-vqd-token"] = vqd
+        headers["Accept"] = "application/json"
+        data = {
+            "model": "meta-llama/Llama-3-70b-Instruct",
+            "messages": [
+                {"role": "system", "content": instruction},
+                {"role": "user", "content": prompt}
+            ]
+        }
+        
+        response = requests.post(url, json=data, headers=headers, timeout=8)
+        res_text = response.text
+        
+        # Parse text stream segments cleanly
+        if "message" in res_text:
+            lines = res_text.split("\n")
+            content = ""
+            for line in lines:
+                if line.startswith("data:"):
+                    try:
+                        chunk = json.loads(line[5:])
+                        if "message" in chunk:
+                            content += chunk["message"]
+                    except:
+                        pass
+            if content:
+                return content
+        return "⚠️ Mainframe data sync packet dropped. Please try resending your prompt."
+        
     except Exception as ddg_err:
-        # Ultimate fallback handler
+        # Step 3: Ultimate Emergency Fallback to OpenRouter OpenChat matrix
         try:
             url = "https://openrouter.ai"
             headers = {"Authorization": f"Bearer {OPENROUTER_KEY}", "Content-Type": "application/json"}
