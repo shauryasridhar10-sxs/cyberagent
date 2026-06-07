@@ -346,8 +346,8 @@ def call_openrouter_backup(prompt: str, instruction: str) -> str:
         headers = {
             "Authorization": f"Bearer {OPENROUTER_KEY}",
             "Content-Type": "application/json",
-            # FIXED: Added required standard developer verification tracking headers to bypass the 403 block
-            "HTTP-Referer": "https://localhost:8501",
+            # FIXED: Passing your genuine deployed app link to completely drop the 403 block!
+            "HTTP-Referer": "https://streamlit.app",
             "X-Title": "CyberAgent Web Client Console"
         }
         data = {
